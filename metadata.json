@@ -1,0 +1,6 @@
+{
+  "name": "GATEForge 2027 - High-Intensity Adaptive GATE Exam Prep",
+  "description": "Distraction-free high-intensity GATE 2027 preparation suite with YouTube study cockpit, AI summaries & formulas notes, authentic TCS iON CBT exam simulator, adaptive weakness-driven roadmap, and gamified progress tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
