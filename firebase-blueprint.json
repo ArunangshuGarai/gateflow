@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account and profile details",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "Student email address" },
+        "displayName": { "type": "string", "description": "Candidate name" },
+        "targetAir": { "type": "number", "description": "Target All India Rank (AIR)" },
+        "dailyTargetHours": { "type": "number", "description": "Daily study target in hours" },
+        "xp": { "type": "number", "description": "Gamification XP points earned" },
+        "level": { "type": "number", "description": "Current GATE mastery level" },
+        "currentStreak": { "type": "number", "description": "Consecutive days studied" },
+        "longestStreak": { "type": "number", "description": "Maximum streak achieved" },
+        "totalHoursStudied": { "type": "number", "description": "Cumulative verified study hours" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last profile sync" }
+      },
+      "required": ["uid", "targetAir", "dailyTargetHours", "xp", "level", "currentStreak", "totalHoursStudied"]
+    },
+    "ErrorLog": {
+      "title": "ErrorLog",
+      "description": "Mistake notebook binder entry for silly errors and conceptual gaps",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique error item identifier" },
+        "userId": { "type": "string", "description": "Owner candidate UID" },
+        "questionId": { "type": "string", "description": "Reference question identifier" },
+        "subject": { "type": "string", "description": "GATE subject" },
+        "topic": { "type": "string", "description": "Specific syllabus topic" },
+        "userAnswer": { "type": "string", "description": "Candidate submitted answer" },
+        "category": { "type": "string", "description": "Error classification (conceptual_gap, silly_reading_trap, etc.)" },
+        "userNotes": { "type": "string", "description": "Self-reflection and formula insight" },
+        "resolved": { "type": "boolean", "description": "Whether the mistake has been mastered" },
+        "timestamp": { "type": "string", "description": "Timestamp when error occurred" }
+      },
+      "required": ["id", "userId", "questionId", "subject", "topic", "category", "resolved"]
+    },
+    "ExamResult": {
+      "title": "ExamResult",
+      "description": "TCS iON CBT Exam Simulator score history and analysis",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique exam attempt ID" },
+        "userId": { "type": "string", "description": "Owner candidate UID" },
+        "examTitle": { "type": "string", "description": "Title of the mock or PYQ paper" },
+        "marksObtained": { "type": "number", "description": "Net marks after negative marking" },
+        "totalMarks": { "type": "number", "description": "Max marks possible" },
+        "accuracyPercentage": { "type": "number", "description": "Accuracy percentage" },
+        "predictedGateScore": { "type": "number", "description": "Predicted GATE score out of 1000" },
+        "estimatedAirBand": { "type": "string", "description": "Estimated All India Rank band" },
+        "weakTopics": { "type": "array", "description": "Topics requiring revision" },
+        "timestamp": { "type": "string", "description": "ISO submission timestamp" }
+      },
+      "required": ["id", "userId", "examTitle", "marksObtained", "totalMarks", "predictedGateScore"]
+    },
+    "SavedFormula": {
+      "title": "SavedFormula",
+      "description": "User created or saved KaTeX formulas for rapid revision",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Formula ID" },
+        "userId": { "type": "string", "description": "Owner candidate UID" },
+        "title": { "type": "string", "description": "Formula title" },
+        "category": { "type": "string", "description": "Subject/Topic category" },
+        "latex": { "type": "string", "description": "LaTeX expression" },
+        "notes": { "type": "string", "description": "Formula intuition and edge cases" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "userId", "title", "latex"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Candidate root profile and aggregated preparation metrics"
+    },
+    "/users/{userId}/errorLogs/{errorId}": {
+      "schema": "ErrorLog",
+      "description": "User's mistake notebook items"
+    },
+    "/users/{userId}/examHistory/{examId}": {
+      "schema": "ExamResult",
+      "description": "Candidate's mock test results and score history"
+    },
+    "/users/{userId}/savedFormulas/{formulaId}": {
+      "schema": "SavedFormula",
+      "description": "Candidate's saved formula sheet entries"
+    }
+  }
+}

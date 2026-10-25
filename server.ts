@@ -346,6 +346,64 @@ Return pure JSON adhering to:
     });
 });
 
+// In-memory OTP storage for student email verification
+const emailOtpStore = new Map<string, { code: string; expiresAt: number; createdAt: number }>();
+
+// Endpoint to generate and dispatch OTP
+app.post('/api/auth/send-otp', (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return res.status(400).json({ success: false, message: 'Valid candidate email is required' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  emailOtpStore.set(normalizedEmail, { code, expiresAt, createdAt: Date.now() });
+  console.log(`[GATE 2027 AUTH] Generated OTP for ${normalizedEmail}: ${code}`);
+
+  return res.json({
+    success: true,
+    message: `Verification code sent to ${normalizedEmail}`,
+    devOtp: code,
+    expiresInSeconds: 600
+  });
+});
+
+// Endpoint to verify OTP
+app.post('/api/auth/verify-otp', (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    return res.status(400).json({ success: false, message: 'Email and 6-digit OTP code are required' });
+  }
+
+  const normalizedEmail = String(email).trim().toLowerCase();
+  const record = emailOtpStore.get(normalizedEmail);
+
+  if (!record) {
+    return res.status(400).json({ success: false, message: 'No OTP requested for this email or it has expired. Please request a new code.' });
+  }
+
+  if (Date.now() > record.expiresAt) {
+    emailOtpStore.delete(normalizedEmail);
+    return res.status(400).json({ success: false, message: 'OTP code has expired. Please request a new code.' });
+  }
+
+  if (record.code !== String(otp).trim()) {
+    return res.status(400).json({ success: false, message: 'Incorrect 6-digit verification code. Please check and retry.' });
+  }
+
+  // Clear OTP on successful verification
+  emailOtpStore.delete(normalizedEmail);
+  return res.json({
+    success: true,
+    verified: true,
+    email: normalizedEmail,
+    message: 'Email address successfully verified!'
+  });
+});
+
 // Mount Vite in dev mode or serve static files in production
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

@@ -1,0 +1,791 @@
+# GATE 2027 Preparation App — Complete Improvement Roadmap
+
+The biggest improvement needed is to make the application a results-driven preparation system, not just a collection of study tools and dashboards.
+
+The app should help a student returning after a two-year preparation gap answer five questions every day:
+
+1. What should I study today?
+2. What is the most efficient way to learn it?
+3. Can I solve GATE-level questions on this topic?
+4. What did I get wrong, and how do I fix it?
+5. What should I do next based on my actual performance?
+
+The recommendations below are a detailed product-improvement specification for your application. Since I couldn't inspect the website's rendered pages directly, these are the changes I recommend implementing or verifying—not a claim that every listed problem currently exists.
+
+## 1\. The highest-priority improvements
+
+### 01
+
+### Build a genuinely adaptive dashboard
+
+P0
+
+Show the next best study action, today's priorities, overdue revision, and a realistic workload instead of overwhelming the student with statistics.
+
+### 02
+
+### Make the study planner performance-aware
+
+P0
+
+Automatically connect topic performance, missed tasks, available study hours, and revision requirements to the roadmap.
+
+### 03
+
+### Connect every module
+
+P0
+
+Link videos to notes and quizzes; incorrect answers to the error notebook; mock results to weakness analysis; and weakness analysis back to the planner.
+
+### 04
+
+### Make assessment reliable
+
+P0
+
+Ensure correct marking schemes, persistent answers, accurate timers, verified question provenance, and robust exam recovery.
+
+### 05
+
+### Create a focused learning workspace
+
+P1
+
+Combine the video, transcript, AI doubt assistant, bookmarks, notes, and topic test into a coherent learning flow.
+
+### 06
+
+### Replace vanity metrics with actionable analytics
+
+P1
+
+Explain which topics are weak, why they are weak, what to do about them, and whether the intervention improved performance.
+
+- P0: Essential for correctness, safety, or the core learning experience.
+- P1: High-impact improvements to learning efficiency and usability.
+- P2: Valuable improvements after the core system works.
+- P3: Optional polish and advanced capabilities.
+
+## 2\. Dashboard improvements
+
+The dashboard should be the student's daily command center. It should not require navigating through multiple pages to discover what to do next.
+
+### Required functional changes
+
+- Add a personalized Continue Learning action that resumes the last relevant video, note, or unfinished study task.
+- Show a maximum of three to five priority tasks for the current day, with an option to view the full schedule.
+- Display due revision tasks generated from incorrect answers, weak concepts, and forgetting risk.
+- Show today's planned hours, actual focused hours, and remaining workload.
+- Detect overdue tasks and offer a realistic rescheduling option.
+- Display the next mock exam, revision deadline, and weekly milestone.
+- Add a clear explanation for recommendations: “Why am I seeing this task?”
+- Provide a quick-start diagnostic test for students who have not yet established a reliable baseline.
+- Show the last session's outcome and the next step.
+
+### Required UI/UX changes
+
+- Make the primary study action the most visually prominent element.
+- Place secondary metrics in compact cards instead of allowing them to dominate the screen.
+- Use clear status labels: Not started, In progress, Due, Completed, and Rescheduled.
+- Avoid unnecessary animated cards, oversized illustrations, or multiple competing calls to action.
+- Make the layout responsive and keep the main action visible on smaller screens.
+- Provide meaningful empty states for new students with no test history or completed topics.
+
+Acceptance criterion: A returning student should be able to open the app and start a useful study activity within a few seconds, without first interpreting a complex dashboard.
+
+## 3\. Onboarding and personalized preparation setup
+
+A student restarting after a long gap should not be given a generic timetable. The app must first understand the student's current position.
+
+### Required functionality
+
+- Ask the student to select their GATE paper and target score or rank aspiration.
+- Record their current preparation level: beginner, returning student, intermediate, or advanced.
+- Allow subjects to be marked as Strong, Partially Prepared, Weak, or Not Started.
+- Ask about weekday and weekend availability, preferred study hours, and realistic daily study capacity.
+- Provide an optional diagnostic assessment to estimate current knowledge.
+- Import or recreate previous preparation progress when the student has historical notes or completed subjects.
+- Ask whether they prefer video lectures, textbooks, problem-solving, or mixed learning.
+- Allow the student to configure the balance between concept learning, PYQs, revision, and mock exams.
+- Let users edit their preferences later without restarting onboarding.
+
+### UI/UX changes
+
+Use a short, progressive onboarding wizard rather than one enormous form.
+
+## Build your preparation profile
+
+Step 2 of 4
+
+What best describes your preparation?
+
+Starting from scratch
+
+returning Returning after a preparation gap
+
+Previously studied most subjects
+
+Mainly need practice and revision
+
+Available study time per day
+
+## 4 hours
+
+1h
+
+5h
+
+10h
+
+Preferred preparation intensity
+
+balanced Balanced — sustainable pace
+
+Intensive — more practice and revision
+
+Recovery-first — rebuild concepts gradually
+
+ Continue onboarding Interactive design example; selections are not saved to your website.
+
+Acceptance criterion: The generated roadmap must reflect the student's selected availability and demonstrated knowledge, rather than simply distributing all syllabus topics evenly.
+
+## 4\. Study planner and adaptive roadmap
+
+This is the most important system-level improvement after exam reliability.
+
+### Required functionality
+
+- Generate daily, weekly, monthly, and long-term plans.
+- Break each syllabus topic into concrete tasks: lecture, notes, practice, PYQs, and revision.
+- Track estimated versus actual completion time.
+- Incorporate prerequisite dependencies between topics.
+- Schedule revision based on mistakes, confidence, and retention.
+- Reprioritize weak topics when new assessment data arrives.
+- Reschedule missed tasks without doubling the following day's workload.
+- Preserve manually pinned sessions and important commitments.
+- Provide alternative plans for busy days and low-energy days.
+- Explain substantial changes before applying them.
+- Allow users to undo a schedule change.
+- Recalculate remaining syllabus coverage as the exam approaches.
+- Reserve sufficient time for PYQs, sectional tests, full-length mocks, and final revision.
+
+### Required UI/UX changes
+
+Provide four views of the same plan:
+
+- Today: actionable checklist and session timer.
+- Calendar: time-blocked daily and weekly schedule.
+- Roadmap: milestone timeline and topic dependencies.
+- Syllabus: topic-level completion and mastery status.
+
+Every task should display its expected duration, priority, completion criteria, and relevant resources.
+
+Example task card:
+
+### Process Scheduling
+
+Concept review · 35 minutes
+
+Objective: Solve turnaround-time and waiting-time problems correctly.
+
+High priority
+
+Reason: Repeated calculation mistakes
+
+Start task  Reschedule
+
+Acceptance criterion: If a student performs poorly on a topic test, the system must create a targeted intervention and update future priorities without disrupting an active study or mock-exam session.
+
+## 5\. Learn module: video player, AI assistant, and notes
+
+The Learn module should function as a single workspace rather than separate pages for videos, summaries, doubts, and notes.
+
+### Required functionality
+
+- Save playback progress and resume from the last watched timestamp.
+- Organize videos by paper, subject, topic, and subtopic.
+- Add timestamped bookmarks for formulas, derivations, and examples.
+- Provide transcript search and jump-to-timestamp navigation when transcripts are available.
+- Generate short summaries, detailed notes, formula sheets, and exam-oriented takeaways.
+- Support contextual AI questions using the current video, timestamp, transcript, and linked notes.
+- Save useful AI explanations directly into notes.
+- Generate a topic test based on the full available lecture content.
+- Handle missing transcripts and unsupported videos gracefully.
+- Maintain a searchable history of doubts and saved explanations.
+- Track actual watched segments rather than assuming that opening or playing a video means the topic is understood.
+
+### Required UI/UX changes
+
+On desktop, use a three-panel workspace:
+
+## Learning workspace
+
+Layout concept
+
+Process Scheduling — Lecture 04
+
+Embedded video player
+
+Bookmarks · Transcript · Playback progress
+
+AI tutor
+
+Ask about this derivation or timestamp.
+
+Explain this step by step...
+
+My notes
+
+Key formulas, examples, and saved explanations.
+
+Autosaved
+
+ Specify learning workspace
+
+On mobile, use tabs for Video, AI, and Notes instead of squeezing all three panels onto one screen.
+
+Acceptance criterion: Completing a lecture should naturally lead to a short assessment, and the student's mistakes should be traceable back to the relevant lecture segment and notes.
+
+## 6\. AI assistant and AI-generated content
+
+AI must improve understanding without introducing incorrect explanations or misleading exam material.
+
+### Required functionality
+
+- Answer questions using available transcript passages and source references.
+- Clearly distinguish transcript-supported statements from general explanations.
+- Allow the student to select a passage, formula, or timestamp before asking a question.
+- Explain derivations step by step and render mathematical expressions correctly.
+- Generate alternative examples and progressively harder practice questions.
+- Support follow-up questions with conversation context.
+- Save useful explanations to the AI Doubt Notebook.
+- Generate lecture summaries at multiple levels of detail.
+- Validate generated questions and answer keys before scored use.
+- Detect and flag uncertain or ambiguous questions.
+- Cache reusable summaries where appropriate.
+- Apply usage limits and handle timeouts, model failures, and unavailable transcripts.
+- Keep private API credentials on the server.
+
+### Required UI/UX changes
+
+- Add suggested prompts such as “Explain simply,” “Show derivation,” “Give a GATE-style example,” and “Explain my mistake.”
+- Display the source timestamp or transcript passage when an answer is grounded in the lecture.
+- Add Copy, Save to Notes, Ask Follow-up, and Report Incorrect Answer actions.
+- Use clear mathematical formatting and collapsible step-by-step solutions.
+- Distinguish generated practice questions from verified PYQs with persistent labels.
+- Provide loading, retry, partial-result, and error states.
+- Avoid interrupting a video with automatic AI-generated pop-ups.
+
+Acceptance criterion: The assistant must not invent lecture content or present unverified AI-generated questions as official GATE questions.
+
+## 7\. Notes creator and Formula Vault
+
+### Required functionality
+
+- Generate notes from accessible transcripts, summaries, bookmarks, and saved explanations.
+- Support editing, rearranging, annotations, and hierarchical topic organization.
+- Link notes to videos, timestamps, syllabus topics, and relevant questions.
+- Maintain formula collections with conditions, assumptions, derivations, and examples.
+- Mark content as Important, Difficult, Frequently Tested, or Needs Revision.
+- Support full-text search, tags, PDF export, and printing.
+- Preserve note versions or provide undo for accidental edits.
+- Enable offline access to selected notes where feasible.
+- Render equations correctly in both the editor and exported PDFs.
+
+### Required UI/UX changes
+
+- Use a readable editor with a clear heading hierarchy and consistent spacing.
+- Add a collapsible subject/topic navigation tree.
+- Provide a formula-focused reading mode with adjustable text size.
+- Show source references beside AI-generated content.
+- Display clear autosave and synchronization status.
+- Offer one-click insertion of saved formulas and AI explanations.
+- Add a compact revision view without editing controls or unnecessary navigation.
+
+Acceptance criterion: A student should be able to retrieve a specific formula, mistake, or lecture explanation in seconds rather than reopening an entire lecture.
+
+## 8\. Practice module and question bank
+
+### Required functionality
+
+- Support MCQ, MSQ, NAT, conceptual, formula-based, and application-oriented questions.
+- Filter questions by paper, subject, topic, subtopic, year, difficulty, and question type.
+- Distinguish verified PYQs, model questions, and AI-generated questions.
+- Track attempted, correct, incorrect, skipped, and bookmarked questions.
+- Provide configurable question count, difficulty, duration, and feedback mode.
+- Generate tests based on weak concepts and previous mistakes.
+- Track repeat attempts without confusing them with first-attempt performance.
+- Build custom question collections and revision sets.
+- Include detailed explanations and relevant source links.
+- Offer practice modes with immediate feedback and exam modes with deferred feedback.
+
+### Required UI/UX changes
+
+- Make filters easy to combine and reset.
+- Keep the question, diagrams, formulas, answer choices, and navigation visually distinct.
+- Show question status without depending on color alone.
+- Provide keyboard navigation and accessible controls.
+- Allow students to flag an incorrect question or explanation.
+- Make the next action after submission explicit: Review mistakes, Retry, Revise concept, or Continue.
+
+### Essential performance metrics
+
+Track first-attempt accuracy separately from repeat-attempt accuracy. Also track time per question, confidence where collected, and the reasons for incorrect answers.
+
+Acceptance criterion: Every incorrect response should be linked to a relevant concept and have a clear route into targeted revision.
+
+## 9\. Mock examination simulator
+
+The mock exam interface should be treated as a reliability-critical feature.
+
+### Required functionality
+
+- Support full papers, sectional tests, subject tests, topic tests, and custom sets.
+- Use the applicable official syllabus, marking rules, and examination structure when verified.
+- Support answer saving, mark for review, question palettes, navigation, and submission confirmation.
+- Autosave answers and recover interrupted sessions.
+- Calculate marks, accuracy, time spent, attempted questions, and unanswered questions correctly.
+- Support a strict Exam Mode, explanatory Practice Mode, and post-exam Analysis Mode.
+- Allow partial practice sessions without forcing the student to finish a full paper.
+- Preserve the exact question set and attempt state for resumed exams.
+- Provide a review of incorrect, skipped, guessed, and time-consuming questions.
+
+### Required UI/UX changes
+
+- Keep the timer, question number, marks, and answer controls visible without obscuring the question.
+- Use distinct but accessible states for Answered, Unanswered, Marked for Review, and Answered and Marked for Review.
+- Include a navigable question palette and clear section controls.
+- Require confirmation before final submission.
+- Provide a review screen listing unanswered questions before submission.
+- Prevent unrelated notifications, animations, and automatic plan updates from interrupting the exam.
+- Make network interruption and recovery states obvious.
+
+Acceptance criterion: A student must never lose a submitted answer because of an accidental refresh, navigation event, or temporary network failure.
+
+## 10\. Revision engine and Error Notebook
+
+### Required functionality
+
+- Automatically create revision items from mistakes, difficult PYQs, forgotten formulas, and weak topics.
+- Use spaced repetition with adjustable review intervals.
+- Let users rate recall confidence and understanding.
+- Schedule follow-up questions to verify actual retention.
+- Record the original question, submitted answer, correct answer, root cause, corrective concept, and subsequent results.
+- Reduce revision priority only when supported by consistent evidence.
+- Support flashcards, formula drills, timed revision, and short diagnostic quizzes.
+- Provide a final revision mode that consolidates high-priority formulas and repeated mistakes.
+
+### Required UI/UX changes
+
+- Separate the daily revision queue from the complete mistake archive.
+- Show why each item is due and estimate the time needed.
+- Provide quick review actions without forcing the student through multiple pages.
+- Make “I understand” different from “I can solve questions correctly.”
+- Offer batch revision sessions and a clear session completion summary.
+
+Acceptance criterion: Revision priority should depend on demonstrated retention and repeated errors, not simply the age of a saved note.
+
+## 11\. Analytics and exam-readiness tracking
+
+### Required functionality
+
+- Track study hours, focused time, syllabus coverage, PYQ completion, and revision completion.
+- Measure subject and topic mastery using multiple attempts over time.
+- Track first-attempt accuracy, solving speed, repeated errors, and retention.
+- Compare mock scores across attempts using comparable test conditions.
+- Identify subjects that are improving and those that need intervention.
+- Generate weekly performance reviews.
+- Estimate readiness using transparent factors rather than a single arbitrary score.
+- Show whether the student is on schedule, ahead, or behind.
+- Provide specific recommendations tied to the underlying evidence.
+
+### Required UI/UX changes
+
+- Use a main overview with a few meaningful metrics.
+- Add detailed pages for Subject Mastery, Mock Performance, Time Management, and Syllabus Coverage.
+- Show trends over time rather than isolated scores.
+- Allow charts to be filtered by subject, topic, date range, and test type.
+- Explain every readiness estimate and show the factors contributing to it.
+- Pair each important chart with a recommended action.
+
+For example, instead of displaying only “Algorithms mastery: 48%,” show:
+
+> Your recent accuracy on graph algorithms is low, and solving time is increasing. Review the prerequisite concepts and complete a short diagnostic test.
+
+Acceptance criterion: Every important analytics page should answer both “What is happening?” and “What should I do about it?”
+
+## 12\. Focus mode and productivity tools
+
+### Required functionality
+
+- Provide configurable Pomodoro sessions and custom study intervals.
+- Track focused work separately from passive video playback.
+- Let students define a session objective and completion criteria.
+- Include short breaks and optional longer breaks.
+- Provide a quick-capture feature for doubts and reminders.
+- Record session outcomes and blockers.
+- Preserve the current session if the page reloads or the browser closes unexpectedly.
+- Avoid disrupting active study sessions with automatic schedule changes.
+
+### Required UI/UX changes
+
+- Hide the global sidebar, secondary widgets, and nonessential notifications.
+- Keep the current task, timer, learning content, and quick-capture tool visible.
+- Provide simple pause, resume, finish, and break controls.
+- Make the interface usable with keyboard shortcuts.
+- Support reduced motion and configurable reminders.
+- Provide a brief session-end review instead of a large celebratory screen.
+
+Acceptance criterion: Entering focus mode should visibly reduce distractions, and leaving it should preserve the student's work and session record.
+
+## 13\. Notifications and gamification
+
+These features should improve consistency without making the app noisy or punitive.
+
+### Required functionality
+
+- Allow users to configure quiet hours, reminder channels, frequency, and intensity.
+- Prioritize urgent revision and scheduled tests.
+- Consolidate less urgent reminders.
+- Allow direct navigation from a reminder to the relevant task.
+- Reward meaningful learning, improvement, and revision consistency.
+- Recognize personal bests and milestones.
+- Allow missed-day recovery without punishing students.
+- Provide options to disable celebratory effects and motivational messages.
+- Avoid awarding substantial rewards for idle time or repeated low-value actions.
+
+### Required UI/UX changes
+
+- Use a notification center with priority, date, and action.
+- Provide a clear “Mark as read” and “Mute” control.
+- Keep achievement animations brief and optional.
+- Avoid making streaks the main measure of preparation success.
+- Celebrate improved accuracy, retained concepts, and completion of difficult work—not just hours logged.
+
+Acceptance criterion: Notifications and rewards should encourage the next useful learning action rather than increase app usage for its own sake.
+
+## 14\. Navigation and information architecture
+
+Use a consistent navigation hierarchy across the entire app.
+
+| Main destination | What belongs inside |
+| --- | --- |
+| Dashboard | Next action, today's priorities, current progress |
+| Study Planner | Calendar, roadmap, syllabus, milestones |
+| Learn | Video player, summaries, AI assistant, notes |
+| Practice | Question bank, topic tests, generated tests |
+| Mock Exams | Full exams, sectional exams, exam history |
+| Revision | Daily queue, formulas, flashcards, error notebook |
+| Analytics | Mastery, scores, time management, readiness |
+| More | Achievements, notifications, resource organizer, settings |
+
+### Required UI/UX changes
+
+- Use consistent labels, icons, and interaction patterns.
+- Keep global navigation stable across screens.
+- Show breadcrumbs or contextual navigation on deeply nested pages.
+- Add global search for topics, notes, formulas, questions, and saved explanations.
+- Preserve scroll position and relevant filters when navigating back.
+- Avoid duplicating the same feature across multiple navigation sections.
+- Use contextual links to move between related content.
+
+Acceptance criterion: A student should be able to move from an incorrect question to the relevant concept, note, or lecture without repeatedly returning to the dashboard.
+
+## 15\. Visual design system and responsive UX
+
+The app should feel calm, technically precise, and comfortable for extended study sessions.
+
+### Required UI/UX changes
+
+Typography and layout
+
+- Use a consistent typography scale and readable body text.
+- Give mathematical expressions sufficient space and avoid clipping equations.
+- Standardize spacing, card padding, border radii, and content widths.
+- Reduce redundant cards, excessive borders, and decorative gradients.
+- Establish a clear hierarchy between primary actions, secondary actions, and metadata.
+
+Colors and themes
+
+- Provide light and dark themes.
+- Use restrained accent colors for important actions.
+- Reserve semantic colors for warnings, errors, and successful completion.
+- Never rely on color alone to communicate question status or mastery.
+- Persist theme preferences across sessions.
+
+Responsive behavior
+
+- Desktop: full learning workspace, rich note editor, and mock exam simulator.
+- Tablet: collapsible navigation and switchable learning panels.
+- Mobile: compact dashboard, short tests, flashcards, and quick revision.
+- Ensure that tables, diagrams, question palettes, and equations remain usable on small screens.
+
+Accessibility
+
+- Support keyboard navigation and visible focus indicators.
+- Provide accessible labels for icon buttons.
+- Maintain readable contrast and support text resizing.
+- Respect reduced-motion settings.
+- Make timers and status updates accessible without excessive announcements.
+- Ensure touch targets are sufficiently large.
+
+Interaction design
+
+- Provide visible loading, saving, saved, error, and offline states.
+- Use skeleton loaders to reduce layout shifts.
+- Add undo for destructive actions and schedule changes.
+- Use animations only when they communicate meaningful state changes.
+- Avoid unnecessary modal dialogs and multi-step flows for simple actions.
+
+### Required design-system components
+
+Create reusable components for:
+
+- Primary and secondary buttons.
+- Task cards and progress indicators.
+- Topic mastery badges.
+- Question palettes and answer controls.
+- Formula and equation blocks.
+- Empty, error, and loading states.
+- Confirmation dialogs.
+- Search and filter controls.
+- Notification items.
+- Chart containers and insight cards.
+
+Acceptance criterion: The same interaction should behave consistently across modules, with no conflicting visual conventions or inaccessible controls.
+
+## 16\. Backend, security, and reliability
+
+These changes may not be visually prominent, but they are essential to a productive preparation application.
+
+### Required functionality
+
+- Use Supabase authentication and appropriate Row Level Security policies.
+- Store user-specific notes, attempts, plans, and progress securely.
+- Keep AI credentials and privileged keys on the server.
+- Validate question submissions, scoring, and access permissions server-side where appropriate.
+- Add autosave and recovery for notes and mock exams.
+- Use safe retry mechanisms for failed requests.
+- Handle AI service limits and video transcript unavailability gracefully.
+- Track AI usage and processing costs.
+- Cache reusable summaries and other suitable outputs.
+- Support synchronization across devices where promised.
+- Back up persistent data and define sensible retention policies.
+- Add monitoring for API failures, database errors, and performance regressions.
+
+### Required testing
+
+- Authentication and session expiry.
+- Cross-user data access prevention.
+- Exam answer persistence and scoring.
+- Notes editing and export.
+- Network interruptions and recovery.
+- Mobile browsers and supported desktop browsers.
+- Concurrent updates across devices.
+- AI failure and retry behavior.
+
+Acceptance criterion: No core learning activity should silently fail or lose user data. Where recovery is impossible, the app must explain the problem and the available options.
+
+## 17\. Central adaptive learning engine
+
+This is the architectural change that ties everything together.
+
+The application should maintain a unified learner state containing topic-level evidence, current commitments, pending revision, recent mistakes, and learning history.
+
+### Required functionality
+
+- Record learning events from every module.
+- Calculate mastery estimates using multiple attempts and evidence over time.
+- Classify mistakes into conceptual gaps, calculation errors, misreading, time pressure, and other useful categories.
+- Identify prerequisite gaps.
+- Schedule revision based on performance and forgetting risk.
+- Recommend appropriate videos, notes, explanations, and practice questions.
+- Adjust future question difficulty when appropriate.
+- Recalculate the roadmap when significant new evidence appears.
+- Explain significant changes and let users retain manual control.
+- Avoid changing the active session or mock exam unexpectedly.
+
+### Recommended event flow
+
+### Learning activity
+
+Video, notes, or revision
+
+### Assessment evidence
+
+Answers, accuracy, timing, confidence
+
+### Learner model
+
+Mastery, misconceptions, retention
+
+### Planning engine
+
+Priority, workload, available time
+
+### Next best action
+
+A specific task with a reason
+
+Do not build the learner model as a single percentage. Topic mastery should account for recency, repeated performance, difficulty, and consistency, with uncertainty where the available evidence is limited.
+
+Acceptance criterion: Every significant assessment should be capable of influencing future recommendations, and users should be able to understand why those recommendations changed.
+
+## 18\. Implementation priority matrix
+
+Do not try to implement every feature at once. Prioritize the changes that most directly improve learning outcomes and protect user data.
+
+| Priority | Changes required | Success measure |
+| --- | --- | --- |
+| P0 | Authentication, database security, exam scoring, autosave, recovery | No critical data-loss or scoring defects |
+| P0 | Dashboard, onboarding, initial study plan | Student can begin a relevant task immediately |
+| P0 | Shared learner-performance model | Assessment results feed into future study recommendations |
+| P1 | Video learning, AI tutor, notes, contextual practice | Complete video-to-practice workflow |
+| P1 | Error notebook, spaced revision, adaptive scheduling | Mistakes reliably create targeted follow-up tasks |
+| P1 | Question bank, PYQs, mock-exam analysis | Reliable assessment and actionable feedback |
+| P2 | Analytics, readiness estimates, weekly review | Insights result in clear study actions |
+| P2 | Focus mode, notifications, rewards | Better consistency without increased distraction |
+| P2 | Responsive layouts, accessibility, design-system consistency | Core workflows work across supported devices |
+| P3 | Advanced personalization, additional visual polish, richer achievements | Improved usability after core flows are reliable |
+
+## 19\. Recommended 6-week execution plan
+
+This is a suggested implementation sequence, assuming the current application already has at least a basic frontend.
+
+Week 1## Audit and stabilize
+
+Inventory existing screens and features
+
+Test authentication, persistence, and exam calculations
+
+Fix critical navigation and responsive defects
+
+Week 2## Dashboard and planner
+
+Implement onboarding and preparation baseline
+
+Redesign today's priorities and next action
+
+Connect tasks to available study hours and syllabus
+
+Week 3## Learning workspace
+
+Integrate video progress and timestamp bookmarks
+
+Improve transcript-aware AI assistance
+
+Add reliable notes autosave and lecture-to-quiz flow
+
+Week 4## Assessment and revision
+
+Validate question types and marking rules
+
+Implement mistake tracking and revision queue
+
+Connect test outcomes to topic-level evidence
+
+Week 5## Adaptive engine and analytics
+
+Implement mastery estimates and recommendation rules
+
+Add workload-aware rescheduling and explanations
+
+Create actionable weekly performance reviews
+
+Week 6## Polish, test, and release
+
+Test desktop, tablet, and mobile journeys
+
+Audit accessibility, security, and recovery
+
+Resolve defects and measure core workflow success
+
+The timeline is a planning target, not a guarantee. If the existing app is only a frontend prototype, backend integration and reliable assessment functionality may require additional time.
+
+## 20\. How to measure whether the improvements work
+
+Measure learning efficiency and reliability rather than total time spent inside the app.
+
+| Metric | What it tells you |
+| --- | --- |
+| Time to first study action | Whether the dashboard is easy to use |
+| Planned-task completion rate | Whether the roadmap is realistic |
+| First-attempt topic accuracy | Whether concepts are being understood |
+| Repeat error rate | Whether targeted revision is effective |
+| Retention on delayed quizzes | Whether knowledge persists |
+| PYQ completion and accuracy | Whether preparation translates to exam-style problem solving |
+| Mock performance trend | Whether exam readiness is improving |
+| Schedule recovery rate | Whether missed tasks can be managed sustainably |
+| Data-loss and scoring defect rate | Whether the app is reliable |
+| Recommendation acceptance and usefulness | Whether the adaptive engine helps users |
+
+Avoid treating app opens, watch time, streak length, or AI queries as evidence of learning on their own.
+
+## 21\. Final implementation checklist
+
+## Product readiness checklist
+
+0/19 checked
+
+### Core experience
+
+[ ]Dashboard shows the next best action
+
+[ ]Onboarding produces a realistic personalized roadmap
+
+[ ]Planner supports workload-aware rescheduling
+
+[ ]Navigation is consistent across all modules
+
+### Learning and assessment
+
+[ ]Video progress and bookmarks persist
+
+[ ]AI answers distinguish source-supported content
+
+[ ]Notes support editing, autosave, and export
+
+[ ]Tests use validated answers and marking rules
+
+[ ]Mock exams recover safely after interruptions
+
+### Adaptive learning
+
+[ ]Incorrect answers create categorized mistakes
+
+[ ]Revision is scheduled using learning evidence
+
+[ ]Topic mastery reflects multiple attempts
+
+[ ]Recommendations explain why they are shown
+
+[ ]Study plans update without disrupting active sessions
+
+### Quality and security
+
+[ ]Supabase policies prevent cross-user access
+
+[ ]AI credentials remain server-side
+
+[ ]Mobile layouts and keyboard navigation work
+
+[ ]Loading, error, and offline states are handled
+
+[ ]Core workflows are tested end to end
+
+Copy checklist  Create dev backlog
+
+## My final recommendation
+
+If you only implement five improvements first, make them these:
+
+1. Redesign the dashboard around the next best study action.
+2. Build a personalized, adaptive planner that respects actual availability.
+3. Connect learning, testing, mistake tracking, and revision into one continuous workflow.
+4. Make the mock-exam simulator accurate, persistent, and reliable.
+5. Build topic-level mastery tracking that explains weaknesses and recommends corrective action.
+
+These five improvements will deliver substantially more value than adding more dashboard cards, animations, badges, or AI buttons.
+
+The product's defining advantage should be that it understands not only what the student has completed, but also what the student can actually solve, what they are forgetting, and what they should study next.

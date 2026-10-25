@@ -1,0 +1,521 @@
+# GATE 2027 Preparation Web Application — Project Requirements
+
+## 1. Project Objective
+
+- Build a personalized, high-intensity, distraction-free web application designed specifically for preparing for the GATE 2027 examination.
+- The application should help a student who is restarting preparation after a two-year gap, with the last attempt or preparation cycle being in 2025.
+- The primary goal is to maximize the user's preparation efficiency, improve conceptual understanding, strengthen weak areas, and achieve their desired GATE score within the available time.
+- The application should function as an all-in-one preparation platform integrating:
+  - Video-based learning.
+  - AI-powered learning assistance.
+  - Automated note creation.
+  - Practice tests and mock examinations.
+  - Personalized study planning.
+  - Progress tracking and performance analytics.
+  - Gamification, rewards, and motivational notifications.
+- Every module should be interconnected so that the user's learning activities, test results, revision needs, and performance automatically influence their personalized study plan.
+
+## 2. YouTube Video Learning Module
+
+- Integrate YouTube videos directly into the application for studying lectures and educational content.
+- Provide a distraction-free video-watching interface optimized for long study sessions.
+- Include standard YouTube playback controls and features, wherever supported by the YouTube integration:
+  - Play and pause.
+  - Playback speed adjustment.
+  - Video quality selection.
+  - Volume control.
+  - Full-screen mode.
+  - Captions and subtitles.
+  - Seeking and timeline navigation.
+  - Keyboard shortcuts.
+  - Picture-in-Picture (PiP), where supported.
+- Allow users to bookmark important timestamps and resume videos from their last watched position.
+- Enable users to create timestamp-based bookmarks for important concepts, derivations, formulas, and examples.
+- Provide a personal video library with categorized playlists, saved lectures, and completed videos.
+- Track video completion, watch time, and learning progress.
+- Minimize distractions by hiding unnecessary recommendations, comments, and other attention-diverting elements where technically possible.
+- Allow users to organize videos according to subjects, topics, subtopics, and their study roadmap.
+
+## 3. AI-Powered Video Summarizer
+
+- Integrate an AI summarization system that generates structured summaries of educational videos.
+- Generate summaries at multiple levels of detail:
+  - Quick revision summary.
+  - Topic-wise summary.
+  - Detailed lecture notes.
+  - Formula and concept summary.
+  - Exam-oriented key takeaways.
+- Identify the most important concepts, definitions, derivations, formulas, assumptions, and examples discussed in the video.
+- Organize the content into headings, subheadings, bullet points, tables, and properly formatted mathematical expressions.
+- Highlight concepts that are frequently tested in GATE, where this can be supported by PYQ analysis.
+- Include timestamps or references to relevant video segments so the user can revisit the original explanation.
+- Allow the user to regenerate, refine, shorten, expand, or customize summaries.
+- Support quick revision sheets for use before tests and examinations.
+
+## 4. AI Video Assistant and Doubt-Solving Module
+
+- Integrate an AI assistant that allows users to ask questions about the video they are watching.
+- Enable the assistant to answer questions using available video transcripts, captions, timestamps, and relevant study materials.
+- Support queries such as:
+  - Explain this concept in simpler terms.
+  - Explain this derivation step by step.
+  - Why is this formula used here?
+  - Give me another example of this concept.
+  - Explain the difference between these two concepts.
+  - How can this topic be tested in GATE?
+  - What are the common mistakes students make in this topic?
+- Allow users to select a particular timestamp or passage and ask questions specifically about that content.
+- Provide mathematical explanations with properly rendered formulas and step-by-step solutions.
+- Allow follow-up questions while retaining the context of the discussion.
+- Maintain a searchable history of doubts and explanations.
+- Let users save useful answers directly to their notes.
+- Clearly distinguish transcript-supported explanations from general AI-generated explanations and avoid fabricating video content.
+
+## 5. AI-Generated Notes Creator
+
+- Create a comprehensive note-generation module that converts video content into detailed, organized study notes.
+- Generate notes using:
+  - Video transcripts.
+  - AI-generated summaries.
+  - Important formulas and derivations.
+  - Examples and solved problems.
+  - User-highlighted timestamps.
+  - Questions and explanations from the AI assistant.
+- Support properly formatted mathematical formulas, equations, symbols, matrices, and derivations.
+- Organize notes into a hierarchical structure of subjects, topics, and subtopics.
+- Allow users to edit, annotate, rearrange, and personalize the generated notes.
+- Include formula sheets, shortcut methods, important concepts, and common mistakes.
+- Provide the ability to mark content as important, frequently tested, difficult, or requiring revision.
+- Allow notes to be exported as professionally formatted PDFs.
+- Support easy access to saved notes, printing, and offline revision where feasible.
+- Connect notes to their original video, timestamps, syllabus topics, and relevant practice questions.
+
+## 6. Topic-Wise Practice and Short Tests
+
+- Allow users to take a short test immediately after completing a video or studying a topic.
+- Generate tests based on the concepts discussed throughout the entire video, rather than only selected portions.
+- Support multiple question types, including:
+  - Multiple-choice questions (MCQs).
+  - Multiple-select questions (MSQs).
+  - Numerical Answer Type (NAT) questions.
+  - Conceptual questions.
+  - Formula-based problems.
+  - Application-oriented questions.
+- Allow users to configure the number of questions, difficulty level, and time limit.
+- Provide a choice between taking a test immediately or scheduling it for later.
+- Include an examination-like interface with a timer, question navigation, answer marking, and submission controls.
+- Provide detailed solutions and explanations after submission or according to the selected test mode.
+- Analyze mistakes and identify concepts that need further study.
+- Automatically add weak topics to the user's revision schedule.
+- Allow users to retake tests and compare their performance across attempts.
+
+## 7. GATE Examination Simulator and Mock Test Module
+
+- Build a realistic examination simulator that closely replicates the GATE examination experience.
+- Support configurable examinations using:
+  - Previous Year Questions (PYQs).
+  - Officially available model question papers.
+  - Subject-wise question banks.
+  - Topic-wise question banks.
+  - Mixed-topic practice sets.
+  - Full-length mock examinations.
+- Allow users to choose between:
+  - A complete GATE paper.
+  - A sectional test.
+  - A subject-specific test.
+  - A topic-specific test.
+  - A custom selection of questions.
+- Provide configurable parameters such as:
+  - Examination duration.
+  - Number of questions.
+  - Subject and topic distribution.
+  - Difficulty level.
+  - Question type.
+  - Marks distribution.
+  - Negative marking, where applicable.
+  - Randomized question order.
+- Reproduce the examination environment with:
+  - A visible countdown timer.
+  - Question palette and navigation.
+  - Mark for review.
+  - Save and revisit answers.
+  - Answer status indicators.
+  - Section navigation, where appropriate.
+  - Submission confirmation.
+- Support full-paper and partial-paper attempts without forcing the user to complete the entire examination every time.
+- Include configurable test modes:
+  - Exam Mode: Strict timing and minimal distractions.
+  - Practice Mode: Immediate feedback and explanations.
+  - Analysis Mode: Review questions, solutions, and mistakes.
+- Calculate marks, accuracy, attempted questions, time spent, and other relevant performance metrics.
+- Compare performance across tests and track progress toward the user's target score.
+- Clearly distinguish official questions, verified PYQs, model questions, and AI-generated questions.
+- Use the official marking scheme and syllabus applicable to the selected GATE paper and examination year.
+
+## 8. AI-Powered Test Generation Module
+
+- Create a dedicated module that generates customized tests using AI.
+- Allow users to generate tests based on:
+  - Subject.
+  - Topic or subtopic.
+  - Difficulty level.
+  - Number of questions.
+  - Available time.
+  - Previous mistakes.
+  - Weak concepts.
+  - Previously studied videos.
+  - User-selected learning objectives.
+- Generate questions that test conceptual understanding, problem-solving ability, and application of formulas.
+- Support MCQs, MSQs, NAT questions, and other suitable formats.
+- Provide correct answers, detailed explanations, and step-by-step mathematical solutions.
+- Validate generated questions and answers before including them in scored assessments wherever possible.
+- Avoid duplicate questions and repetitive patterns.
+- Allow users to save generated tests and reuse them for revision.
+- Provide a dedicated mode for practicing questions similar in style and difficulty to verified GATE PYQs without falsely labeling AI-generated questions as official questions.
+
+## 9. Personalized Study Roadmap and Planner
+
+- Develop an interactive study planner that creates a personalized preparation strategy for GATE 2027.
+- The planner should account for the time remaining before the examination and the user's current level of preparation.
+- Allow users to configure:
+  - Target GATE paper and branch.
+  - Target score or rank aspiration.
+  - Current preparation level.
+  - Previously completed subjects and topics.
+  - Daily and weekly study availability.
+  - Preferred study hours.
+  - Weekday and weekend schedules.
+  - Preparation intensity.
+  - Strong and weak subjects.
+  - Preferred learning methods.
+  - Time required for lectures, practice, revision, and testing.
+- Generate a structured roadmap covering:
+  - Conceptual learning.
+  - Video lectures.
+  - Note preparation.
+  - Formula memorization.
+  - Topic-wise practice.
+  - PYQ solving.
+  - Revision cycles.
+  - Sectional tests.
+  - Full-length mock tests.
+  - Final examination revision.
+- Divide the roadmap into yearly or long-term milestones where relevant, monthly goals, weekly targets, and daily tasks.
+- Allow users to view their plan through calendar, timeline, checklist, and dashboard interfaces.
+- Include adjustable daily study targets and realistic break intervals.
+- Provide a mechanism to reorganize the schedule automatically when the user misses a task or falls behind.
+- Prioritize high-impact topics, prerequisite concepts, and weak areas while maintaining coverage of the required syllabus.
+- Allow users to modify the roadmap manually without losing the benefits of automated planning.
+- Provide a clear overview of what to study next, why it matters, and when it should be completed.
+
+## 10. Adaptive Learning and Automatic Study Plan Updates
+
+- Connect the study planner with every learning and assessment module.
+- Automatically record the user's:
+  - Video completion and watch time.
+  - Notes created and reviewed.
+  - Questions attempted.
+  - Test scores and accuracy.
+  - Time spent per question.
+  - Incorrect and skipped questions.
+  - Repeated mistakes.
+  - Weak and strong topics.
+  - Revision history.
+- Analyze test results to identify knowledge gaps and recurring misconceptions.
+- Assign topic-level mastery indicators based on performance and consistency rather than a single test result.
+- Automatically prioritize weak topics for additional study and revision.
+- Schedule revision sessions based on forgetting risk, previous performance, and time remaining.
+- Recommend relevant videos, notes, explanations, and practice questions when a user struggles with a concept.
+- Adjust the difficulty of future practice sessions according to the user's performance.
+- Reschedule lower-priority tasks when urgent revision or additional practice becomes necessary.
+- Recalculate the roadmap whenever significant new performance data becomes available.
+- Provide transparent explanations for major changes to the plan so users understand why a topic has been prioritized.
+- Ensure that the system remains adaptive without continuously disrupting the user's current study session.
+
+## 11. Performance Analytics and Progress Tracking
+
+- Create a dedicated analytics dashboard that presents the user's preparation status at a glance.
+- Track metrics such as:
+  - Total study hours.
+  - Daily and weekly study consistency.
+  - Syllabus completion percentage.
+  - Subject-wise and topic-wise mastery.
+  - Accuracy and question-solving speed.
+  - Mock test scores.
+  - PYQ completion.
+  - Revision completion.
+  - Weak-topic count.
+  - Improvement over time.
+- Provide charts and visualizations showing performance trends.
+- Identify subjects that are improving and subjects that require additional attention.
+- Compare current performance with the user's previous attempts and personal targets.
+- Display projected progress toward the target score, clearly labeling projections as estimates rather than guarantees.
+- Track whether the user is on schedule, falling behind, or ahead of the planned roadmap.
+- Provide actionable recommendations instead of displaying statistics alone.
+- Include a weekly performance review that summarizes achievements, mistakes, and the next week's priorities.
+
+## 12. Gamification and Reward System
+
+- Introduce a motivating reward system that encourages consistent preparation without distracting users from learning.
+- Award points or experience for:
+  - Completing planned study sessions.
+  - Finishing videos.
+  - Creating and reviewing notes.
+  - Completing tests.
+  - Improving accuracy.
+  - Revising weak topics.
+  - Achieving daily and weekly goals.
+  - Maintaining consistency.
+- Introduce levels, achievement badges, milestones, progress indicators, and personal bests.
+- Track study streaks while allowing reasonable recovery from missed days.
+- Provide celebratory animations when users complete meaningful milestones.
+- Display contextual motivational messages after tests, study sessions, and roadmap milestones.
+
+Examples of motivational messages:
+
+- "You're getting closer. One concept at a time."
+- "Your mistakes are becoming your strengths. Keep going."
+- "You showed up today. That's how results are built."
+- "This weak topic won't stay weak for long."
+- "Every PYQ you solve brings you one step closer to your goal."
+- "You didn't just study today. You invested in your future."
+- "Your consistency is building the score you're aiming for."
+- "One more revision today can save you valuable marks tomorrow."
+- "You've improved since your last attempt. Keep that momentum alive."
+- "The finish line is getting closer. Stay focused."
+
+- Make rewards proportional to meaningful effort and improvement rather than simply time spent with the application open.
+- Avoid punitive mechanics that discourage users after a difficult test or an interrupted study streak.
+- Allow users to customize motivational messages and reduce celebratory effects if they find them distracting.
+
+## 13. Notifications and Smart Reminders
+
+- Provide an intelligent reminder system for upcoming study sessions, tests, and revision tasks.
+- Send notifications for:
+  - Scheduled study sessions.
+  - Incomplete daily goals.
+  - Upcoming mock examinations.
+  - Topics due for revision.
+  - Weak concepts requiring additional practice.
+  - Missed tasks that need rescheduling.
+  - Weekly roadmap reviews.
+  - Important preparation milestones.
+- Generate reminders based on the user's availability and preferred study schedule.
+- Provide motivational notifications that encourage the user to resume studying without creating unnecessary pressure.
+- Support in-app notifications and, where supported and authorized, browser push notifications and email reminders.
+- Allow users to configure notification frequency, quiet hours, preferred channels, and reminder intensity.
+- Make notifications actionable by allowing users to open the relevant video, note, test, or study task directly.
+- Prevent notification overload by prioritizing important tasks and consolidating less urgent reminders.
+
+## 14. Interactive and Engaging UI/UX Design
+
+- Design a modern, polished, high-performance interface optimized for extended study sessions.
+- Prioritize focus, usability, readability, and fast access to essential study tools.
+- Use a clean visual hierarchy with minimal distractions.
+- Include a dedicated focus mode with reduced interface clutter and fewer interruptions.
+- Use meaningful UI animations and transitions to improve engagement without compromising performance.
+- Incorporate:
+  - Smooth page transitions.
+  - Animated progress indicators.
+  - Interactive charts.
+  - Subtle feedback animations.
+  - Achievement animations.
+  - Responsive dashboards.
+  - Interactive study calendars.
+  - Dynamic roadmaps.
+  - Clear test countdowns and status indicators.
+- Provide customizable light and dark themes, with a comfortable dark mode for extended study sessions.
+- Use typography and spacing that support mathematical formulas, technical content, and long-form notes.
+- Ensure the interface works well on desktop, tablet, and mobile devices.
+- Optimize navigation so users can move quickly between learning, testing, revision, and analytics.
+- Keep the primary dashboard focused on the most important action the user should take next.
+
+## 15. Focus Mode and Productivity Tools
+
+- Provide a dedicated study environment that minimizes distractions.
+- Include a configurable Pomodoro timer and custom study intervals.
+- Allow users to schedule focused sessions for individual subjects or topics.
+- Track focused study time separately from passive video playback.
+- Include short break reminders and optional longer breaks.
+- Provide a distraction-free reading mode for notes and formulas.
+- Offer a study session checklist with a defined objective and completion criteria.
+- Allow users to set daily study commitments and review their completion at the end of the day.
+- Provide a quick-capture feature for recording doubts, reminders, and concepts to revisit later.
+- Prevent unnecessary animations, notifications, and interface changes during active examination or focus sessions.
+
+## 16. PYQ and Question Bank Management
+
+- Build a structured question bank organized by:
+  - GATE paper.
+  - Subject.
+  - Topic.
+  - Subtopic.
+  - Examination year.
+  - Question type.
+  - Difficulty level.
+  - Marks.
+- Store verified PYQs separately from model and AI-generated questions.
+- Allow users to filter questions according to their learning needs.
+- Track attempted, correct, incorrect, skipped, and bookmarked questions.
+- Create a dedicated error notebook containing previously incorrect questions.
+- Allow users to revisit questions they found difficult or answered incorrectly multiple times.
+- Support custom question collections and revision sets.
+- Link questions to relevant concepts, videos, notes, and explanations.
+- Track PYQ completion and accuracy by topic to identify areas that need more attention.
+
+## 17. Revision and Mistake Management System
+
+- Create a dedicated revision module that automatically identifies content requiring review.
+- Generate revision tasks from:
+  - Incorrect test answers.
+  - Repeated conceptual mistakes.
+  - Forgotten formulas.
+  - Low-confidence answers.
+  - Difficult PYQs.
+  - Incomplete notes.
+  - Topics that have not been revised recently.
+- Use spaced repetition to schedule revision at appropriate intervals.
+- Provide quick revision cards, formula sheets, flashcards, and short quizzes.
+- Allow users to mark a concept as understood, partially understood, or not understood.
+- Reassess difficult topics after revision to determine whether mastery has improved.
+- Automatically remove or reduce revision priority when the user demonstrates consistent understanding.
+- Maintain a searchable mistake log with the question, the user's answer, the correct answer, the reason for the mistake, and the corrective concept.
+
+## 18. Supabase Database and User Data Management
+
+- Use Supabase as the backend platform for secure data storage, authentication, and synchronization.
+- Implement user authentication and secure account management.
+- Store user-specific information, including:
+  - Profile and GATE preparation preferences.
+  - Target score and examination details.
+  - Study schedules and roadmaps.
+  - Video history and bookmarks.
+  - Notes and PDF export references.
+  - Test attempts and answers.
+  - Question bank metadata.
+  - Performance analytics.
+  - Revision schedules.
+  - Achievements and rewards.
+  - Notifications and preferences.
+- Design a structured relational database with suitable tables and relationships.
+- Use Row Level Security (RLS) to ensure that users can access only the data they are authorized to access.
+- Implement real-time synchronization where useful, such as updating progress and study plans across devices.
+- Use Supabase Storage for suitable user-generated files and exported documents where appropriate.
+- Implement backups, sensible data retention policies, and secure handling of personal information.
+- Store API credentials and privileged keys securely on the server rather than exposing them in client-side code.
+
+## 19. AI Integration and Backend Architecture
+
+- Integrate AI services for summarization, question answering, note creation, question generation, and performance-based recommendations.
+- Create a modular backend architecture that allows AI providers or models to be changed when needed.
+- Use server-side functions or secure backend endpoints for AI requests that require private API credentials.
+- Track token usage, request limits, and processing costs.
+- Cache reusable outputs, such as video summaries and generated notes, when appropriate.
+- Use available transcripts or captions as source material for video-based AI features.
+- Handle unavailable transcripts, inaccessible videos, unsupported formats, and AI processing failures gracefully.
+- Validate AI-generated questions and solutions before using them for scored tests whenever possible.
+- Store AI-generated content with appropriate source references and timestamps.
+- Avoid presenting AI-generated scores, predictions, or recommendations as guaranteed outcomes.
+
+## 20. Security, Reliability, and Performance
+
+- Implement secure authentication, session management, and authorization.
+- Protect user data and API credentials.
+- Apply database access policies and validate user input on the server.
+- Optimize video loading, database queries, AI requests, and dashboard rendering.
+- Use lazy loading and caching where appropriate.
+- Ensure that active tests are resilient to accidental refreshes or temporary network interruptions.
+- Autosave test answers and notes at suitable intervals.
+- Provide recovery mechanisms for interrupted sessions.
+- Handle network failures, API errors, and unavailable external services with clear feedback.
+- Ensure accessible navigation, keyboard support, and readable contrast.
+- Make the application responsive and reliable across supported browsers and devices.
+
+## 21. Additional Features to Improve GATE Preparation
+
+- Syllabus Coverage Tracker: Map every topic to the official syllabus and track its completion status.
+- Prerequisite Dependency Map: Identify foundational topics that must be learned before advanced concepts.
+- Formula Vault: Maintain a searchable collection of important formulas, derivations, conditions, and shortcuts.
+- AI Doubt Notebook: Automatically organize questions and explanations into subject-wise collections.
+- Exam Readiness Score: Estimate preparation readiness from syllabus coverage, mastery, revision status, and mock test performance.
+- Weakness Heatmap: Visually identify topics with low accuracy, poor retention, or repeated mistakes.
+- Mock Test Review Assistant: Analyze incorrect and time-consuming questions and recommend targeted practice.
+- Time Management Analytics: Identify questions that consume too much time and suggest areas for improvement.
+- Revision Countdown: Prioritize topics as the examination approaches.
+- Weekly Strategy Review: Recommend changes to study hours and subject priorities based on recent results.
+- Resource Organizer: Allow users to save useful external resources and connect them to relevant topics.
+- Study Session Journal: Record daily accomplishments, difficulties, and next steps.
+- Offline Revision Support: Make selected notes, formulas, and other suitable study materials available offline.
+- Personal Best Tracking: Highlight improvements in accuracy, speed, consistency, and topic mastery.
+- Final Revision Mode: Provide a focused interface for formula revision, important PYQs, error notebooks, and full-length mock examinations.
+
+## 22. Integration Between All Modules
+
+- Ensure that every module communicates with the central study planner and learner-performance system.
+- When a user finishes a video, the application should recommend the next appropriate activity, such as reviewing notes or attempting a short test.
+- When a user performs poorly in a test, the system should identify the relevant weak topics and schedule additional learning and revision.
+- When a user improves in a weak topic, the planner should update its mastery estimate and adjust future revision priorities.
+- When a mock examination reveals poor time management or weak subject areas, the system should incorporate these findings into the preparation roadmap.
+- When a user misses a scheduled task, the system should recommend a realistic rescheduling strategy.
+- When the user completes a milestone, the reward system should recognize the achievement and update progress analytics.
+- When the remaining preparation time decreases, the planner should reassess priorities and balance syllabus coverage, revision, and mock tests.
+- Every significant learning activity should contribute to a unified understanding of the user's preparation status.
+
+The core principle is that the application should not operate as a collection of independent tools. It should function as a single adaptive learning ecosystem in which every video, note, question, test, revision session, and performance result helps determine what the student should do next.
+
+## 23. Recommended Main Navigation Structure
+
+- Dashboard: Today's priorities, study progress, upcoming tasks, and next recommended action.
+- Study Planner: Personalized roadmap, calendar, daily schedule, and milestones.
+- Learn: YouTube video player, AI assistant, summaries, and notes.
+- Practice: Topic-wise tests, AI-generated questions, and question banks.
+- Mock Exams: Full-length papers, sectional tests, and examination simulator.
+- Revision: Spaced repetition, formula sheets, flashcards, and mistake notebook.
+- Analytics: Subject mastery, score trends, time management, and readiness indicators.
+- Achievements: Rewards, streaks, badges, milestones, and personal bests.
+- Notifications: Reminders, revision alerts, and schedule updates.
+- Settings: Profile, target score, preparation intensity, schedule, themes, AI preferences, and notification controls.
+
+## 24. Expected Final Outcome
+
+The finished application should provide a personalized, adaptive, and engaging GATE 2027 preparation experience that helps the user:
+
+- Restart preparation systematically after a long study gap.
+- Learn concepts efficiently through integrated video learning.
+- Understand difficult topics through AI assistance.
+- Automatically generate structured notes and revision materials.
+- Practice topic-wise questions and verified PYQs.
+- Experience realistic GATE-style examinations.
+- Identify and improve weak areas through continuous assessment.
+- Maintain a realistic, continuously updated study roadmap.
+- Stay motivated through meaningful rewards and reminders.
+- Track preparation progress and make data-driven decisions.
+- Use the remaining preparation time as effectively as possible.
+
+The application should be designed to maximize learning efficiency, consistency, and exam readiness—not merely to maximize screen time.
+
+## 25. Suggested Implementation Priorities
+
+To make this project achievable, develop it in phases rather than trying to implement every feature simultaneously.
+
+| Phase | Core deliverables |
+| --- | --- |
+| Phase 1 — Foundation | Authentication, Supabase database, dashboard, syllabus setup, study planner |
+| Phase 2 — Learning | YouTube integration, bookmarks, AI assistant, summarizer, notes and PDF export |
+| Phase 3 — Assessment | Topic tests, PYQ bank, AI test generation, examination simulator |
+| Phase 4 — Adaptation | Performance analysis, weak-topic detection, revision scheduling, adaptive roadmap |
+| Phase 5 — Engagement | Gamification, animations, notifications, focus tools, progress dashboards |
+| Phase 6 — Optimization | Reliability, accessibility, security review, performance improvements and final testing |
+
+Important implementation considerations:
+
+- Use the official GATE 2027 syllabus and examination information for the selected paper once the relevant information is available and verified.
+- YouTube integration should respect YouTube's API, embedding, and content-access restrictions. Not every YouTube feature can necessarily be reproduced inside a custom player.
+- AI features should use available transcripts and authorized source material; arbitrary videos may not provide accessible transcripts.
+- Examination questions, scoring rules, and negative marking should be configurable according to the relevant official paper.
+- The personalized planner should use actual performance data and available study hours, rather than promising a particular rank or score.
+- Supabase should be the source of truth for persistent user data, while AI services should enhance the learning experience through secure backend integrations.
+
+The most important architectural decision is to build the adaptive study planner and performance engine as the central system. All other modules should feed information into it and receive recommendations from it. This is what will distinguish the application from a conventional study dashboard or a simple collection of AI tools.
+ 
+From this description implement the database functionality . Also below the Youtube video , the AI Tutor , Notes-Personal Study Notes , Formula  and the Transcript all should be extracted from the Youtube video in proper details and formulas and notes  formatted from the YOutube video itself

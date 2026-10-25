@@ -16,6 +16,8 @@ import { SyllabusExplorer } from './components/SyllabusExplorer';
 import { FormulaVault } from './components/FormulaVault';
 import { DeepWorkFocusHub } from './components/DeepWorkFocusHub';
 import { RewardModal } from './components/RewardModal';
+import { AuthModal } from './components/AuthModal';
+import { ResetStatsModal } from './components/ResetStatsModal';
 import {
   GateQuestion,
   NotificationItem,
@@ -51,10 +53,34 @@ import {
   RotateCcw,
   Zap
 } from 'lucide-react';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import {
+  auth,
+  testConnection,
+  signInAsGuest,
+  signInWithGoogle,
+  signOutUser,
+  syncUserProfileToCloud,
+  loadUserProfileFromCloud,
+  syncErrorLogToCloud,
+  loadErrorLogsFromCloud,
+  syncExamResultToCloud,
+  syncCustomFormulaToCloud,
+  loadCustomFormulasFromCloud,
+  resetUserCloudData
+} from './services/firebase';
 
 const STORAGE_KEY = 'gateforge_2027_state_v2';
 
 export default function App() {
+  // Firebase Cloud Database State
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [cloudSyncStatus, setCloudSyncStatus] = useState<'synced' | 'syncing' | 'offline'>('syncing');
+
+  // Multi-user Auth & Reset Stats Modals
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isResetStatsModalOpen, setIsResetStatsModalOpen] = useState(false);
+
   // Navigation tab: 'dashboard' | 'planner' | 'learn' | 'practice' | 'exams' | 'revision' | 'analytics' | 'syllabus' | 'vault' | 'focus'
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
   const [selectedLearnVideoId, setSelectedLearnVideoId] = useState<string>('vid-os-srtf');
@@ -65,7 +91,31 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.planState) return parsed.planState;
+        if (parsed.planState && parsed.planState.phases) {
+          const freshPhases = generateInitialRoadmap(parsed.planState.profile?.branch || 'CS');
+          const mergedPhases = freshPhases.map((freshPhase, pIdx) => {
+            const savedPhase = parsed.planState.phases[pIdx] || freshPhase;
+            return {
+              ...savedPhase,
+              nodes: freshPhase.nodes.map((freshNode, nIdx) => {
+                const savedNode = savedPhase.nodes?.[nIdx] || freshNode;
+                const nodeSubtopics = (savedNode.subtopics && savedNode.subtopics.length > 0) 
+                  ? savedNode.subtopics 
+                  : (freshNode.subtopics || []);
+                return {
+                  ...freshNode,
+                  ...savedNode,
+                  subtopics: nodeSubtopics,
+                  manualCheckouts: savedNode.manualCheckouts || freshNode.manualCheckouts || {}
+                };
+              })
+            };
+          });
+          return {
+            ...parsed.planState,
+            phases: mergedPhases
+          };
+        }
       }
     } catch (e) {}
 
@@ -228,6 +278,84 @@ export default function App() {
     } catch (e) {}
   }, [planState, dailyTasks, customFormulas, errorLogs]);
 
+  // Firebase Auth initialization and cloud restore
+  useEffect(() => {
+    testConnection().then(ok => {
+      if (!ok) setCloudSyncStatus('offline');
+    });
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setCurrentUser(user);
+        setCloudSyncStatus('syncing');
+        try {
+          const cloudProfile = await loadUserProfileFromCloud(user.uid);
+          if (cloudProfile && cloudProfile.profile) {
+            setPlanState(prev => ({
+              ...prev,
+              profile: {
+                ...prev.profile,
+                ...cloudProfile.profile
+              }
+            }));
+          }
+          const cloudErrors = await loadErrorLogsFromCloud(user.uid);
+          if (cloudErrors && cloudErrors.length > 0) {
+            setErrorLogs(prev => {
+              const existingIds = new Set(prev.map(e => e.id));
+              const merged = [...prev];
+              cloudErrors.forEach(ce => {
+                if (!existingIds.has(ce.id)) merged.push(ce);
+              });
+              return merged;
+            });
+          }
+          const cloudFormulas = await loadCustomFormulasFromCloud(user.uid);
+          if (cloudFormulas && cloudFormulas.length > 0) {
+            setCustomFormulas(prev => {
+              const titles = new Set(prev.map(p => p.title));
+              const merged = [...prev];
+              cloudFormulas.forEach(cf => {
+                if (!titles.has(cf.title)) merged.push(cf);
+              });
+              return merged;
+            });
+          }
+          setCloudSyncStatus('synced');
+        } catch (err) {
+          console.warn('Cloud sync initialization warning:', err);
+          setCloudSyncStatus('synced');
+        }
+      } else {
+        // Automatically authenticate candidate as guest for seamless cloud persistence
+        signInAsGuest().then(u => {
+          if (u) setCurrentUser(u);
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Debounced auto-sync of roadmap metrics to Firestore
+  useEffect(() => {
+    if (!currentUser || currentUser.isAnonymous || !auth.currentUser) {
+      setCloudSyncStatus('synced');
+      return;
+    }
+    setCloudSyncStatus('syncing');
+    const timer = setTimeout(async () => {
+      try {
+        await syncUserProfileToCloud(currentUser.uid, planState);
+        setCloudSyncStatus('synced');
+      } catch (e) {
+        console.warn('Firestore profile sync note:', e);
+        setCloudSyncStatus('synced');
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [currentUser, planState]);
+
   // XP addition helper
   const handleAddXp = (amount: number, reason: string) => {
     const newXp = planState.profile.xpPoints + amount;
@@ -264,14 +392,43 @@ export default function App() {
     }));
   };
 
-  // 1. Launch Full Mock Examination (TCS iON Simulator)
+  // 1. Launch Full Mock Examination (Authentic 3-Hour TCS iON Simulator)
   const handleLaunchFullMock = () => {
     setActiveExam({
       questions: INITIAL_GATE_EXAM_QUESTIONS,
-      title: 'GATE 2027 Official Model Computer-Based Mock Test',
-      durationMin: 30
+      title: 'GATE 2027 Official 3-Hour Grand Mock Paper (65 Qs)',
+      durationMin: 180
     });
     setCurrentTab('exams');
+  };
+
+  // Handle Application-wide Stats Reset (0 Stats Fresh Slate)
+  const handleResetComplete = async (freshState: StudyPlanState) => {
+    setPlanState(freshState);
+    setErrorLogs([]);
+    setDailyTasks(prev => prev.map(t => ({ ...t, completed: false })));
+    setCustomFormulas([]);
+    if (currentUser && !currentUser.isAnonymous && auth.currentUser) {
+      try {
+        await resetUserCloudData(currentUser.uid);
+      } catch (e) {
+        console.warn('Cloud reset warning:', e);
+      }
+    }
+    setMotivationToast('Application progress reset to 0 stats. Ready for a fresh start!');
+  };
+
+  // Handle Application-wide Stats Calibration (Custom baseline numbers)
+  const handleCalibrateComplete = async (updatedState: StudyPlanState) => {
+    setPlanState(updatedState);
+    if (currentUser && !currentUser.isAnonymous && auth.currentUser) {
+      try {
+        await syncUserProfileToCloud(currentUser.uid, updatedState);
+      } catch (e) {
+        console.warn('Cloud calibration sync warning:', e);
+      }
+    }
+    setMotivationToast(`Application metrics updated: ${updatedState.profile.dailyHours}h/day, target: ${updatedState.profile.targetRankBand}.`);
   };
 
   // 2. Launch Specific Preset or Configured Part
@@ -426,6 +583,14 @@ export default function App() {
         }}
         onLaunchFullMock={handleLaunchFullMock}
         unresolvedMistakesCount={errorLogs.filter(e => !e.resolved).length}
+        currentUser={currentUser}
+        cloudSyncStatus={cloudSyncStatus}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onOpenResetStatsModal={() => setIsResetStatsModalOpen(true)}
+        onSignOut={async () => {
+          await signOutUser();
+          setMotivationToast('Signed out. Data preserved in Firestore.');
+        }}
       />
 
       {/* Floating Motivational Banner */}
@@ -461,6 +626,7 @@ export default function App() {
             onLaunchFullMock={handleLaunchFullMock}
             errorLogs={errorLogs}
             onAddXp={handleAddXp}
+            onOpenResetStatsModal={() => setIsResetStatsModalOpen(true)}
           />
         )}
 
@@ -472,6 +638,7 @@ export default function App() {
             onSelectTopicForVideo={handleSelectTopicForVideo}
             onLaunchTopicTest={handleLaunchTopicTest}
             onAddXp={handleAddXp}
+            onOpenResetStatsModal={() => setIsResetStatsModalOpen(true)}
           />
         )}
 
@@ -553,11 +720,11 @@ export default function App() {
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
                   <div className="flex flex-wrap items-center gap-2">
                     {[
-                      { id: 'all', label: 'All Papers' },
-                      { id: 'Full Mock', label: 'Full Mocks' },
-                      { id: 'PYQ Year Paper', label: 'PYQ Papers' },
-                      { id: 'Subject Test', label: 'Subject Tests' },
-                      { id: 'Speed Drill', label: 'Speed Drills' }
+                      { id: 'all', label: 'All Exam Papers' },
+                      { id: '3-Hour Full Mock', label: '3-Hour Full Mocks (180m)' },
+                      { id: 'Sectional Mock', label: 'Sectional Mocks (90m)' },
+                      { id: '30-Min Revision Mock', label: 'Revision Mocks (30m)' },
+                      { id: '15-Min Rapid Sprint', label: 'Rapid Sprints (15m)' }
                     ].map(tab => (
                       <button
                         key={tab.id}
@@ -588,13 +755,13 @@ export default function App() {
                       <div className="space-y-3">
                         <div className="flex items-center justify-between gap-2">
                           <span className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${
-                            preset.category === 'Full Mock'
+                            preset.category === '3-Hour Full Mock'
                               ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
-                              : preset.category === 'PYQ Year Paper'
+                              : preset.category === 'Sectional Mock'
+                              ? 'bg-cyan-950 text-cyan-300 border-cyan-800'
+                              : preset.category === '30-Min Revision Mock'
                               ? 'bg-amber-950 text-amber-300 border-amber-800'
-                              : preset.category === 'Subject Test'
-                              ? 'bg-indigo-950 text-indigo-300 border-indigo-800'
-                              : 'bg-cyan-950 text-cyan-300 border-cyan-800'
+                              : 'bg-rose-950 text-rose-300 border-rose-800'
                           }`}>
                             {preset.category}
                           </span>
@@ -833,6 +1000,25 @@ export default function App() {
         message={rewardModal.message}
         xpGained={rewardModal.xpGained}
         streakCount={planState.profile.currentStreak}
+      />
+
+      {/* Multi-User Authentication Modal (Google Account, Email/Password & Email OTP) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={(user) => {
+          setCurrentUser(user);
+          setMotivationToast(`Welcome, ${user.displayName || user.email || 'Candidate'}! Progress synced with Firestore cloud database.`);
+        }}
+      />
+
+      {/* Reset & Calibrate Progress Modal (Zero State or Custom Baseline) */}
+      <ResetStatsModal
+        isOpen={isResetStatsModalOpen}
+        onClose={() => setIsResetStatsModalOpen(false)}
+        planState={planState}
+        onResetComplete={handleResetComplete}
+        onCalibrateComplete={handleCalibrateComplete}
       />
     </div>
   );

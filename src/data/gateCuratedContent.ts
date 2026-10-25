@@ -1,4 +1,5 @@
-import { CuratedVideo, GateQuestion, FlashcardItem, DailyTaskItem, SyllabusSubject } from '../types';
+import { CuratedVideo, GateQuestion, FlashcardItem, DailyTaskItem, SyllabusSubject, MockExamPreset } from '../types';
+import { OFFICIAL_GATE_65_QUESTIONS, DIVERSIFIED_EXAM_PRESETS } from './gateExamBank';
 
 export const CURATED_GATE_VIDEOS: CuratedVideo[] = [
   {
@@ -291,7 +292,7 @@ export const MOTIVATIONAL_QUOTES = [
   'Keep calm and trust the process. Concepts built with derivation never fade under pressure.'
 ];
 
-export const INITIAL_GATE_EXAM_QUESTIONS: GateQuestion[] = [
+export const LEGACY_PRACTICE_SAMPLE_QUESTIONS: GateQuestion[] = [
   // SECTION 1: General Aptitude (Q1 to Q5)
   {
     id: 'ga-1',
@@ -562,50 +563,11 @@ export const INITIAL_GATE_EXAM_QUESTIONS: GateQuestion[] = [
   }
 ];
 
-export const MOCK_EXAM_PRESETS = [
-  {
-    id: 'preset-full-mock',
-    title: 'GATE 2027 Grand CBT Mock Paper (Comprehensive)',
-    category: 'Full Mock' as const,
-    questionCount: 12,
-    durationMinutes: 30,
-    totalMarks: 20,
-    description: 'Balanced full-spectrum test simulating real exam distribution: General Aptitude (Verbal, Quant, Logic) + Core Engineering (Algorithms, OS, DBMS, Networks, Math, COA).',
-    questions: INITIAL_GATE_EXAM_QUESTIONS
-  },
-  {
-    id: 'preset-pyq-2024',
-    title: 'GATE 2024 Official PYQ Diagnostic Paper',
-    category: 'PYQ Year Paper' as const,
-    questionCount: 6,
-    durationMinutes: 18,
-    totalMarks: 11,
-    description: 'Actual questions from GATE 2024 papers testing recurrence unwinding, pipelining clock latency, and Bayesian inference.',
-    questions: INITIAL_GATE_EXAM_QUESTIONS.filter(q => q.pyqYear === 2024 || q.marks === 2)
-  },
-  {
-    id: 'preset-systems-sprint',
-    title: 'Core Systems Mastery: OS, DBMS & Networks',
-    category: 'Subject Test' as const,
-    questionCount: 5,
-    durationMinutes: 15,
-    totalMarks: 10,
-    description: 'Targeted focus on IPC Semaphores, Basic 2PL serializability, and CIDR subnet allocation with NAT keypad practice.',
-    questions: INITIAL_GATE_EXAM_QUESTIONS.filter(q =>
-      ['Operating Systems', 'Databases (DBMS)', 'Computer Networks', 'Computer Organization & Architecture'].includes(q.subject)
-    )
-  },
-  {
-    id: 'preset-speed-drill',
-    title: '10-Minute High-Yield Formula Speed Sprint',
-    category: 'Speed Drill' as const,
-    questionCount: 4,
-    durationMinutes: 10,
-    totalMarks: 6,
-    description: 'Fast-paced 1-mark and 2-mark calculations to sharpen virtual calculator agility and reduce silly errors.',
-    questions: INITIAL_GATE_EXAM_QUESTIONS.slice(0, 4)
-  }
-];
+// Comprehensive 65-Question Bank for GATE 2027
+export const INITIAL_GATE_EXAM_QUESTIONS = OFFICIAL_GATE_65_QUESTIONS;
+
+// Complete Diversified Mock Exam Presets (180m, 90m, 30m, 15m)
+export const MOCK_EXAM_PRESETS: MockExamPreset[] = DIVERSIFIED_EXAM_PRESETS;
 
 export const INITIAL_FORMULAS = [
   {

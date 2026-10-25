@@ -14,9 +14,10 @@ import {
   BookOpen,
   Calendar,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  Check
 } from 'lucide-react';
-import { StudyPlanState, RoadmapNode, RoadmapPhase } from '../utils/roadmapEngine';
+import { StudyPlanState, RoadmapNode, RoadmapPhase, generateInitialRoadmap } from '../utils/roadmapEngine';
 
 interface AdaptiveRoadmapViewProps {
   planState: StudyPlanState;
@@ -24,6 +25,7 @@ interface AdaptiveRoadmapViewProps {
   onSelectTopicForVideo: (topic: string, subject: string) => void;
   onLaunchTopicTest: (topic: string) => void;
   onAddXp: (amount: number, reason: string) => void;
+  onOpenResetStatsModal?: () => void;
 }
 
 export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
@@ -31,7 +33,8 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
   onUpdatePlan,
   onSelectTopicForVideo,
   onLaunchTopicTest,
-  onAddXp
+  onAddXp,
+  onOpenResetStatsModal
 }) => {
   const [selectedNode, setSelectedNode] = useState<RoadmapNode | null>(null);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
@@ -56,16 +59,66 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
     onAddXp(25, 'Calibrated GATE 2027 Study Strategy');
   };
 
-  const handleMarkNodeComplete = (nodeId: string) => {
+  // Helper to ensure every node has its complete syllabus subtopics
+  const getSubtopicsForNode = (node: RoadmapNode): string[] => {
+    if (node.subtopics && node.subtopics.length > 0) {
+      return node.subtopics;
+    }
+    const defaultPhases = generateInitialRoadmap(planState.profile.branch || 'CS');
+    for (const ph of defaultPhases) {
+      const match = ph.nodes.find(n => n.id === node.id || n.topic === node.topic);
+      if (match && match.subtopics && match.subtopics.length > 0) {
+        return match.subtopics;
+      }
+    }
+    return [
+      'Core Theoretical Framework & Definitions',
+      'Standard Formulas, Bounds & Time Complexities',
+      'GATE Standard Solved Problems (1-Mark & 2-Mark)',
+      'Previous 15-Year PYQ Pattern Breakdown',
+      'Common Traps, Edge Cases & Speed Shortcuts'
+    ];
+  };
+
+  // Toggle individual subtopic manual checkout
+  const handleToggleSubtopic = (nodeId: string, subtopic: string) => {
+    let nextNodeState: RoadmapNode | null = null;
+    let gainedXp = 0;
+
     const updatedPhases = planState.phases.map(phase => ({
       ...phase,
       nodes: phase.nodes.map(n => {
         if (n.id === nodeId) {
-          return {
+          const nodeSubtopics = getSubtopicsForNode(n);
+          const currentCheckouts = { ...(n.manualCheckouts || {}) };
+          const willBeChecked = !currentCheckouts[subtopic];
+          currentCheckouts[subtopic] = willBeChecked;
+
+          const totalSubtopics = nodeSubtopics.length || 1;
+          const checkedCount = Object.values(currentCheckouts).filter(Boolean).length;
+          const newMastery = Math.min(100, Math.round((checkedCount / totalSubtopics) * 100));
+
+          let newStatus: RoadmapNode['status'] = n.status;
+          if (newMastery === 100) {
+            newStatus = 'completed';
+          } else if (newMastery > 0) {
+            newStatus = 'in_progress';
+          }
+
+          if (willBeChecked) {
+            gainedXp = 15;
+          }
+
+          const updatedNode: RoadmapNode = {
             ...n,
-            status: 'completed' as const,
-            masteryPercentage: 100
+            subtopics: nodeSubtopics,
+            manualCheckouts: currentCheckouts,
+            masteryPercentage: newMastery,
+            status: newStatus
           };
+
+          nextNodeState = updatedNode;
+          return updatedNode;
         }
         return n;
       })
@@ -75,9 +128,49 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
       ...planState,
       phases: updatedPhases
     });
-    onAddXp(100, `Completed Milestone: ${selectedNode?.topic}`);
-    if (selectedNode && selectedNode.id === nodeId) {
-      setSelectedNode({ ...selectedNode, status: 'completed', masteryPercentage: 100 });
+
+    if (gainedXp > 0) {
+      onAddXp(gainedXp, `Manual Checkout: ${subtopic}`);
+    }
+
+    if (nextNodeState && selectedNode && selectedNode.id === nodeId) {
+      setSelectedNode(nextNodeState);
+    }
+  };
+
+  const handleMarkNodeComplete = (nodeId: string) => {
+    let completedNode: RoadmapNode | null = null;
+    const updatedPhases = planState.phases.map(phase => ({
+      ...phase,
+      nodes: phase.nodes.map(n => {
+        if (n.id === nodeId) {
+          const nodeSubtopics = getSubtopicsForNode(n);
+          const allChecked: { [k: string]: boolean } = {};
+          nodeSubtopics.forEach(sub => {
+            allChecked[sub] = true;
+          });
+
+          const nodeCompleted: RoadmapNode = {
+            ...n,
+            subtopics: nodeSubtopics,
+            status: 'completed',
+            masteryPercentage: 100,
+            manualCheckouts: allChecked
+          };
+          completedNode = nodeCompleted;
+          return nodeCompleted;
+        }
+        return n;
+      })
+    }));
+
+    onUpdatePlan({
+      ...planState,
+      phases: updatedPhases
+    });
+    onAddXp(100, `Completed Milestone: ${selectedNode?.topic || 'Topic'}`);
+    if (completedNode && selectedNode && selectedNode.id === nodeId) {
+      setSelectedNode(completedNode);
     }
   };
 
@@ -119,16 +212,26 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
             Targeting {planState.profile.targetRankBand} • Branch: {planState.profile.branch}
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Paced for: <strong>{planState.profile.dailyHours} Hours/Day</strong> • Comeback Gap: <strong>{planState.profile.gapYears} Years</strong> • Dynamic exam feedback loop active
+            Paced for: <strong>{planState.profile.dailyHours} Hours/Day</strong> • Comeback Gap: <strong>{planState.profile.gapYears} Years</strong> • Dynamic syllabus subtopic checkouts active
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          {onOpenResetStatsModal && (
+            <button
+              onClick={onOpenResetStatsModal}
+              className="bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-900/50 hover:border-rose-700 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+              title="Reset progress to 0 or calibrate baseline numbers"
+            >
+              <RotateCcw size={14} className="text-rose-400" /> Reset / Calibrate Stats
+            </button>
+          )}
+
           <button
             onClick={() => setIsConfigModalOpen(true)}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500 px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md"
           >
-            <Sliders size={14} /> Re-Calibrate Strategy
+            <Sliders size={14} /> Strategy Settings
           </button>
         </div>
       </div>
@@ -215,6 +318,8 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {phase.nodes.map((node) => {
                 const isSelected = selectedNode?.id === node.id;
+                const nodeSubtopics = getSubtopicsForNode(node);
+                const checkedCount = Object.values(node.manualCheckouts || {}).filter(Boolean).length;
                 return (
                   <div
                     key={node.id}
@@ -254,8 +359,10 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
                       </div>
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400">
-                      <span>Est: {node.estimatedHours} hrs</span>
+                    <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                      <span className="font-mono text-[10px] text-slate-400">
+                        {checkedCount}/{nodeSubtopics.length} subtopics
+                      </span>
                       <span className="text-indigo-400 font-medium flex items-center gap-0.5">
                         Details <ChevronRight size={12} />
                       </span>
@@ -271,7 +378,7 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
       {/* Selected Node Drawer / Detail View */}
       {selectedNode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-xl p-5 shadow-2xl space-y-4 text-slate-100">
+          <div className="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-xl p-5 shadow-2xl space-y-4 text-slate-100 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <span className="text-xs font-semibold text-indigo-400 uppercase">{selectedNode.subject}</span>
@@ -297,6 +404,56 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Estimated Effort:</span>
                 <span className="text-slate-200">{selectedNode.estimatedHours} hours (including revision)</span>
+              </div>
+            </div>
+
+            {/* Subtopics Detailed Manual Checklist (Independent of video progress) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-white block">Syllabus Subtopics &amp; Manual Checkout</span>
+                  <span className="text-[10px] text-slate-400">
+                    Track completion manually (independent of video timeline progress)
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-[#A3E635] bg-[#A3E635]/10 border border-[#A3E635]/20 px-2 py-0.5 rounded">
+                  {Object.values(selectedNode.manualCheckouts || {}).filter(Boolean).length} / {getSubtopicsForNode(selectedNode).length} Checked
+                </span>
+              </div>
+
+              <div className="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 space-y-1.5 max-h-52 overflow-y-auto">
+                {getSubtopicsForNode(selectedNode).map((subtopic, sIdx) => {
+                  const isChecked = !!selectedNode.manualCheckouts?.[subtopic];
+                  return (
+                    <div
+                      key={sIdx}
+                      onClick={() => handleToggleSubtopic(selectedNode.id, subtopic)}
+                      className={`p-2 rounded-lg border text-xs cursor-pointer flex items-center justify-between gap-3 transition-colors ${
+                        isChecked
+                          ? 'bg-[#142318] border-emerald-600/50 text-white'
+                          : 'bg-[#111318] border-slate-800/80 text-slate-300 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <div
+                          className={`h-4 w-4 rounded flex items-center justify-center shrink-0 border transition-colors ${
+                            isChecked
+                              ? 'bg-[#A3E635] border-[#A3E635] text-slate-950 font-black'
+                              : 'border-slate-600 bg-slate-900'
+                          }`}
+                        >
+                          {isChecked && <Check size={11} className="stroke-[3]" />}
+                        </div>
+                        <span className={`text-xs ${isChecked ? 'line-through text-slate-400' : 'text-slate-200'}`}>
+                          {subtopic}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-[#A3E635] shrink-0 font-semibold">
+                        {isChecked ? '+15 XP' : 'Click to checkout'}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -338,7 +495,7 @@ export const AdaptiveRoadmapView: React.FC<AdaptiveRoadmapViewProps> = ({
                 onClick={() => handleMarkNodeComplete(selectedNode.id)}
                 className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 flex items-center gap-1"
               >
-                <CheckCircle size={14} className="text-emerald-400" /> Mark as Mastered
+                <CheckCircle size={14} className="text-emerald-400" /> Mark All Mastered (+100 XP)
               </button>
             </div>
           </div>

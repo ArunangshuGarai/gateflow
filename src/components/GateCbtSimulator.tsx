@@ -61,14 +61,18 @@ export const GateCbtSimulator: React.FC<GateCbtSimulatorProps> = ({
     setAnswers(initial);
   }, [questions]);
 
+  // Keep answers reference up to date for timer auto-submit
+  const answersRef = React.useRef(answers);
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
   // Exam Countdown Timer
   useEffect(() => {
     if (examSubmitted) return;
     const interval = setInterval(() => {
       setTimeLeftSeconds(prev => {
         if (prev <= 1) {
-          clearInterval(interval);
-          handleSubmitExam();
           return 0;
         }
         return prev - 1;
@@ -76,6 +80,13 @@ export const GateCbtSimulator: React.FC<GateCbtSimulatorProps> = ({
     }, 1000);
     return () => clearInterval(interval);
   }, [examSubmitted]);
+
+  // Handle auto-submission when timer expires
+  useEffect(() => {
+    if (timeLeftSeconds <= 0 && !examSubmitted) {
+      handleSubmitExam();
+    }
+  }, [timeLeftSeconds, examSubmitted]);
 
   const currentQ = questions[currentIndex] || questions[0];
   const currentRecord = answers[currentQ?.id] || {
@@ -250,12 +261,14 @@ export const GateCbtSimulator: React.FC<GateCbtSimulatorProps> = ({
 
   // Submit and evaluate
   const handleSubmitExam = () => {
+    if (examSubmitted) return;
     setIsSubmitModalOpen(false);
 
+    const currentAnswers = answersRef.current || answers;
     const errorItems: ErrorLogItem[] = [];
 
     const submissions = questions.map(q => {
-      const rec = answers[q.id];
+      const rec = currentAnswers[q.id];
       const isCorrect = evaluateAnswer(q.type, rec?.answer ?? null, q.correctAnswer, q.tolerance);
       const isAttempted = rec?.answer !== null && rec?.answer !== '' &&
         !(Array.isArray(rec?.answer) && rec?.answer.length === 0);
@@ -297,7 +310,11 @@ export const GateCbtSimulator: React.FC<GateCbtSimulatorProps> = ({
     const results = calculateExamResults(submissions);
     setExamResults(results);
     setExamSubmitted(true);
-    onFinishExam(results, errorItems);
+
+    // Defer notifying parent to prevent setState during render warning
+    setTimeout(() => {
+      onFinishExam(results, errorItems);
+    }, 0);
   };
 
   // Palette status counts

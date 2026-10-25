@@ -16,6 +16,7 @@ import {
   Layers,
   ChevronRight,
   Maximize2,
+  Minimize2,
   Tv,
   Volume2,
   VolumeX,
@@ -63,10 +64,36 @@ export const YoutubeCockpit: React.FC<YoutubeCockpitProps> = ({
   const [showSpeedMenu, setShowSpeedMenu] = useState<boolean>(false);
   const [showPlaylistDrawer, setShowPlaylistDrawer] = useState<boolean>(false);
 
-  // Main Tabs: 'ai_tutor' | 'notes' | 'transcript' (as shown in image_ecc29566.png)
-  const [mainTab, setMainTab] = useState<'ai_tutor' | 'notes' | 'transcript'>('ai_tutor');
-  // Sub-tabs: 'ai_tutor' | 'summary' | 'bookmarks' (as shown in image_ecc29566.png)
+  // Video container reference for Fullscreen API
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  // Main Tabs: 'ai_tutor' | 'notes' | 'formulas' | 'transcript'
+  const [mainTab, setMainTab] = useState<'ai_tutor' | 'notes' | 'formulas' | 'transcript'>('ai_tutor');
+  // Sub-tabs: 'ai_tutor' | 'summary' | 'bookmarks'
   const [subTab, setSubTab] = useState<'ai_tutor' | 'summary' | 'bookmarks'>('ai_tutor');
+
+  // Sync fullscreen state
+  useEffect(() => {
+    const onFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!videoContainerRef.current) return;
+    if (!document.fullscreenElement) {
+      videoContainerRef.current.requestFullscreen().then(() => setIsFullscreen(true)).catch(err => {
+        console.warn('Fullscreen request failed:', err);
+      });
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(err => {
+        console.warn('Exit fullscreen failed:', err);
+      });
+    }
+  };
 
   // Custom YouTube URL Loader
   const [customUrl, setCustomUrl] = useState('');
@@ -453,7 +480,7 @@ $$\\text{Waiting Time (WT)} = \\text{TAT} - \\text{Burst Time (BT)}$$
         {/* Video Player Box with Authentic YouTube Embed & Custom Study Control Strip */}
         <div className="space-y-2">
           {/* 16:9 Video Canvas */}
-          <div className="relative aspect-video rounded-xl overflow-hidden bg-black border border-slate-800 shadow-xl group">
+          <div ref={videoContainerRef} className="relative aspect-video rounded-xl overflow-hidden bg-black border border-slate-800 shadow-xl group">
             <iframe
               src={`https://www.youtube-nocookie.com/embed/${selectedVideo.youtubeId}?enablejsapi=1&rel=0&modestbranding=1&start=${currentTimeSec}`}
               title={selectedVideo.title}
@@ -556,6 +583,17 @@ $$\\text{Waiting Time (WT)} = \\text{TAT} - \\text{Burst Time (BT)}$$
                   <CheckCircle2 size={13} />
                   <span>Test this topic</span>
                 </button>
+
+                {/* Fullscreen Video Toggle Button */}
+                <button
+                  onClick={toggleFullscreen}
+                  className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                  title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+                  aria-label="Toggle Fullscreen"
+                >
+                  {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                  <span className="hidden sm:inline font-mono text-[10px]">{isFullscreen ? 'Exit' : 'Full'}</span>
+                </button>
               </div>
 
               {/* "+ Save timestamp" Action Button (Exact layout and label from image_ecc29566.png) */}
@@ -570,8 +608,8 @@ $$\\text{Waiting Time (WT)} = \\text{TAT} - \\text{Burst Time (BT)}$$
           </div>
         </div>
 
-        {/* 3 Main Segmented Workspace Tabs (AI Tutor | Notes | Transcript) from image_ecc29566.png */}
-        <div className="grid grid-cols-3 gap-2 bg-[#101217] p-1.5 rounded-xl border border-slate-800/80">
+        {/* 4 Main Segmented Workspace Tabs (AI Tutor | Notes | Formulas | Transcript) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-[#101217] p-1.5 rounded-xl border border-slate-800/80">
           <button
             onClick={() => {
               setMainTab('ai_tutor');
@@ -598,7 +636,21 @@ $$\\text{Waiting Time (WT)} = \\text{TAT} - \\text{Burst Time (BT)}$$
             }`}
           >
             <FileText size={14} className={mainTab === 'notes' ? 'text-[#A3E635]' : 'text-slate-500'} />
-            <span>Notes</span>
+            <span>Study Notes</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setMainTab('formulas');
+            }}
+            className={`py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition-all ${
+              mainTab === 'formulas'
+                ? 'bg-[#222731] text-white shadow-md border border-slate-700/80'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+            }`}
+          >
+            <BookOpen size={14} className={mainTab === 'formulas' ? 'text-[#A3E635]' : 'text-slate-500'} />
+            <span>Formula Sheet</span>
           </button>
 
           <button
@@ -989,6 +1041,112 @@ $$\\text{Waiting Time (WT)} = \\text{TAT} - \\text{Burst Time (BT)}$$
                         <FormattedMathText text={`$$${f.latex}$$`} />
                       </div>
                       <div className="text-[10px] text-slate-400">Usage: {f.usage}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ============================================================ */}
+        {/* VIEW 4B: FORMULA SHEET TAB (Key Formulas & KaTeX Formulations) */}
+        {/* ============================================================ */}
+        {mainTab === 'formulas' && (
+          <div className="space-y-4 pt-1">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                  <BookOpen size={16} className="text-[#A3E635]" />
+                  Core GATE Formulas &amp; Equations
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Formulas and mathematical criteria verified for {selectedVideo.topic} ({selectedVideo.subject})
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleGenerateNotes}
+                  disabled={isGeneratingNotes}
+                  className="bg-[#A3E635] hover:bg-[#86efac] text-slate-950 font-bold text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition-transform active:scale-95 disabled:opacity-50"
+                >
+                  <Sparkles size={13} />
+                  <span>{isGeneratingNotes ? 'Extracting...' : 'AI KaTeX Cheat-Sheet'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Core Lecture Formulas */}
+            <div className="space-y-3">
+              {selectedVideo.keyFormulas.map((formula, idx) => (
+                <div
+                  key={idx}
+                  className="bg-[#111318] border border-slate-800 hover:border-slate-700 rounded-xl p-4 space-y-3 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-[#A3E635] uppercase tracking-wider bg-[#A3E635]/10 border border-[#A3E635]/20 px-2 py-0.5 rounded">
+                      Formula #{idx + 1}
+                    </span>
+                    <button
+                      onClick={() => {
+                        onSaveNoteToVault({
+                          title: `${selectedVideo.topic} Formula #${idx + 1}`,
+                          category: selectedVideo.subject,
+                          latex: formula,
+                          notes: `Extracted from lecture: ${selectedVideo.title}`
+                        });
+                      }}
+                      className="text-xs text-[#60A5FA] hover:text-[#93c5fd] font-semibold flex items-center gap-1"
+                    >
+                      <Bookmark size={12} /> Save to Vault
+                    </button>
+                  </div>
+
+                  <div className="bg-[#1a1f29] rounded-lg p-3 text-center overflow-x-auto text-sm text-white">
+                    <FormattedMathText text={`$$${formula}$$`} />
+                  </div>
+
+                  <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/60">
+                    <span>Subject: <strong className="text-slate-300">{selectedVideo.subject}</strong></span>
+                    <span className="font-mono text-slate-500">GATE 2027 Syllabus Verified</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Generated KaTeX formulas if available */}
+            {generatedNotes && (
+              <div className="bg-[#111318] border border-[#A3E635]/30 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={14} className="text-[#A3E635]" />
+                  <h4 className="font-bold text-white text-xs">{generatedNotes.title}</h4>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {generatedNotes.formulas.map((f, i) => (
+                    <div key={i} className="bg-[#1a1f29] p-3 rounded-lg border border-slate-800 text-xs space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-200">{f.name}</span>
+                        <button
+                          onClick={() => {
+                            onSaveNoteToVault({
+                              title: f.name,
+                              category: selectedVideo.subject,
+                              latex: f.latex,
+                              notes: f.usage
+                            });
+                          }}
+                          className="text-[10px] text-[#A3E635] hover:underline font-semibold"
+                        >
+                          + Vault
+                        </button>
+                      </div>
+                      <div className="p-2 bg-[#111318] rounded text-center overflow-x-auto">
+                        <FormattedMathText text={`$$${f.latex}$$`} />
+                      </div>
+                      <div className="text-[10px] text-slate-400 leading-snug">
+                        <strong>Exam Application:</strong> {f.usage}
+                      </div>
                     </div>
                   ))}
                 </div>

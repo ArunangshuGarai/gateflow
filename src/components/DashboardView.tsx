@@ -38,6 +38,7 @@ interface DashboardViewProps {
   onLaunchFullMock: () => void;
   errorLogs: ErrorLogItem[];
   onAddXp: (amount: number, reason: string) => void;
+  onOpenResetStatsModal?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -49,10 +50,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onLaunchTopicTest,
   onLaunchFullMock,
   errorLogs,
-  onAddXp
+  onAddXp,
+  onOpenResetStatsModal
 }) => {
   const unresolvedMistakes = errorLogs.filter(e => !e.resolved);
   const completedTasksCount = dailyTasks.filter(t => t.completed).length;
+
+  // Dynamically calculate metrics
+  const totalStudyHrs = planState.profile.totalHoursStudied || 0;
+  const studyHoursInt = Math.floor(totalStudyHrs);
+  const studyMinsInt = Math.round((totalStudyHrs - studyHoursInt) * 60);
+
+  const allRoadmapNodes = planState.phases.flatMap(p => p.nodes);
+  const completedRoadmapNodes = allRoadmapNodes.filter(n => n.status === 'completed' || n.masteryPercentage >= 100);
+  const syllabusCompletedPercent = allRoadmapNodes.length > 0 
+    ? Math.round((completedRoadmapNodes.length / allRoadmapNodes.length) * 100) 
+    : 0;
+
+  const totalEvaluatedItems = errorLogs.length + (planState.profile.xpPoints > 0 ? 12 : 0);
+  const practiceAccuracyPercent = totalEvaluatedItems > 0
+    ? Math.min(100, Math.max(0, Math.round(((totalEvaluatedItems - unresolvedMistakes.length) / totalEvaluatedItems) * 100)))
+    : 0;
+
+  const revisionDueCount = unresolvedMistakes.length + planState.urgentRevisionQueue.length;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto animate-in fade-in duration-300">
@@ -63,24 +83,37 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             Good evening. Let&apos;s make today count.
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Saturday, 24 October · Your preparation overview
+            GATE 2027 Workspace · Level: <strong className="text-slate-200">{planState.profile.level}</strong> ({planState.profile.xpPoints} XP)
           </p>
         </div>
 
-        {/* Top Right Countdown Card (Matches image_fef8b187.png) */}
-        <div
-          onClick={() => onNavigateTab('exams')}
-          className="bg-[#171b22] border border-slate-800/80 hover:border-slate-700 px-3.5 py-2 rounded-xl flex items-center gap-3 cursor-pointer transition-all hover:scale-[1.02] shadow-sm shrink-0 w-fit"
-          title="Click to view GATE 2027 Mock Exam Papers"
-        >
-          <div className="p-1.5 rounded-lg bg-slate-800 text-[#A3E635]">
-            <Clock size={16} />
-          </div>
-          <div>
-            <div className="text-xs font-black text-white font-mono flex items-center gap-1.5">
-              <span>GATE 2027</span>
+        {/* Top Right Action & Countdown Buttons */}
+        <div className="flex items-center gap-2.5">
+          {onOpenResetStatsModal && (
+            <button
+              onClick={onOpenResetStatsModal}
+              className="bg-[#171b22] border border-rose-900/50 hover:border-rose-600 px-3 py-2 rounded-xl flex items-center gap-2 cursor-pointer transition-all hover:scale-[1.02] shadow-sm text-xs font-semibold text-rose-300"
+              title="Reset progress to 0 or update baseline stats"
+            >
+              <RotateCcw size={15} className="text-rose-400" />
+              <span>Reset / Update Stats</span>
+            </button>
+          )}
+
+          <div
+            onClick={() => onNavigateTab('exams')}
+            className="bg-[#171b22] border border-slate-800/80 hover:border-slate-700 px-3.5 py-2 rounded-xl flex items-center gap-3 cursor-pointer transition-all hover:scale-[1.02] shadow-sm shrink-0 w-fit"
+            title="Click to view GATE 2027 Mock Exam Papers"
+          >
+            <div className="p-1.5 rounded-lg bg-slate-800 text-[#A3E635]">
+              <Clock size={16} />
             </div>
-            <div className="text-[10px] text-slate-400 font-medium">Countdown</div>
+            <div>
+              <div className="text-xs font-black text-white font-mono flex items-center gap-1.5">
+                <span>GATE 2027</span>
+              </div>
+              <div className="text-[10px] text-slate-400 font-medium">Countdown</div>
+            </div>
           </div>
         </div>
       </div>
@@ -137,8 +170,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <Clock size={16} />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-black text-white font-mono">3h 20m</div>
-            <div className="text-xs text-slate-400 mt-0.5">Focused study today</div>
+            <div className="text-xl sm:text-2xl font-black text-white font-mono">
+              {studyHoursInt}h {studyMinsInt}m
+            </div>
+            <div className="text-xs text-slate-400 mt-0.5">Focused study total</div>
           </div>
         </div>
 
@@ -148,7 +183,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <Target size={16} />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-black text-white font-mono">72%</div>
+            <div className="text-xl sm:text-2xl font-black text-white font-mono">
+              {practiceAccuracyPercent}%
+            </div>
             <div className="text-xs text-slate-400 mt-0.5">Recent practice accuracy</div>
           </div>
         </div>
@@ -159,8 +196,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <BookOpen size={16} />
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-black text-white font-mono">38%</div>
-            <div className="text-xs text-slate-400 mt-0.5">Syllabus completed</div>
+            <div className="text-xl sm:text-2xl font-black text-white font-mono">
+              {syllabusCompletedPercent}%
+            </div>
+            <div className="text-xs text-slate-400 mt-0.5">Syllabus milestones mastered</div>
           </div>
         </div>
 
@@ -174,7 +213,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <div>
             <div className="text-xl sm:text-2xl font-black text-white font-mono">
-              {Math.max(6, unresolvedMistakes.length)}
+              {revisionDueCount}
             </div>
             <div className="text-xs text-slate-400 mt-0.5">Topics due for revision</div>
           </div>
@@ -188,68 +227,59 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
               <h3 className="text-sm font-bold text-white">Today&apos;s plan</h3>
-              <span className="text-xs text-slate-400 font-mono">3 tasks · 2h 15m planned</span>
+              <span className="text-xs text-slate-400 font-mono">
+                {dailyTasks.length} tasks · {completedTasksCount} completed
+              </span>
             </div>
 
-            {/* Checklist Items */}
+            {/* Checklist Items connected to dailyTasks */}
             <div className="space-y-3">
-              {/* Task 1: Finish Process Scheduling lecture */}
-              <div
-                onClick={() => onSelectTopicForVideo('CPU Scheduling', 'Operating Systems')}
-                className="flex items-center justify-between gap-3 text-xs cursor-pointer group py-1"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-5 w-5 rounded-full bg-[#A3E635] flex items-center justify-center text-slate-950 shrink-0">
-                    <Check size={12} className="stroke-[3]" />
+              {dailyTasks.map((task) => (
+                <div
+                  key={task.id}
+                  onClick={() => onToggleTask(task.id)}
+                  className="flex items-center justify-between gap-3 text-xs cursor-pointer group py-1"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`h-5 w-5 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                        task.completed
+                          ? 'bg-[#A3E635] text-slate-950 font-bold'
+                          : 'border border-slate-600 group-hover:border-[#A3E635]'
+                      }`}
+                    >
+                      {task.completed && <Check size={12} className="stroke-[3]" />}
+                    </div>
+                    <div>
+                      <span
+                        className={`font-semibold transition-colors ${
+                          task.completed
+                            ? 'line-through text-slate-400 group-hover:text-slate-300'
+                            : 'text-slate-200 group-hover:text-white'
+                        }`}
+                      >
+                        {task.title}
+                      </span>
+                      <p className="text-[11px] text-slate-500">
+                        {task.category} · {task.durationMinutes} min · +{task.xpReward} XP
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-semibold text-slate-200 line-through text-slate-400 group-hover:text-white transition-colors">
-                      Finish Process Scheduling lecture
-                    </span>
-                    <p className="text-[11px] text-slate-500">Learning · 35 min</p>
-                  </div>
+                  <div
+                    className={`h-2 w-2 rounded-full ${
+                      task.completed ? 'bg-[#A3E635]' : 'bg-slate-600'
+                    }`}
+                  />
                 </div>
-                <div className="h-2 w-2 rounded-full bg-[#A3E635]" />
-              </div>
-
-              {/* Task 2: Solve a topic-wise mini test */}
-              <div
-                onClick={() => onLaunchTopicTest('CPU Scheduling')}
-                className="flex items-center justify-between gap-3 text-xs cursor-pointer group py-1"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-5 w-5 rounded-full border border-slate-600 flex items-center justify-center group-hover:border-[#A3E635] shrink-0" />
-                  <div>
-                    <span className="font-semibold text-slate-200 group-hover:text-white transition-colors">
-                      Solve a topic-wise mini test
-                    </span>
-                    <p className="text-[11px] text-slate-500">Practice · 25 min</p>
-                  </div>
-                </div>
-                <div className="h-2 w-2 rounded-full bg-slate-600" />
-              </div>
-
-              {/* Task 3: Review yesterday's formula cards */}
-              <div
-                onClick={() => onNavigateTab('vault')}
-                className="flex items-center justify-between gap-3 text-xs cursor-pointer group py-1"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-5 w-5 rounded-full border border-slate-600 flex items-center justify-center group-hover:border-[#A3E635] shrink-0" />
-                  <div>
-                    <span className="font-semibold text-slate-200 group-hover:text-white transition-colors">
-                      Review yesterday&apos;s formula cards
-                    </span>
-                    <p className="text-[11px] text-slate-500">Revision · 15 min</p>
-                  </div>
-                </div>
-                <div className="h-2 w-2 rounded-full bg-slate-600" />
-              </div>
+              ))}
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800/80 text-xs text-slate-400">
-            1 of 3 tasks completed
+          <div className="pt-3 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-between">
+            <span>{completedTasksCount} of {dailyTasks.length} tasks completed</span>
+            {completedTasksCount === dailyTasks.length && (
+              <span className="text-[#A3E635] font-bold">All tasks completed today! 🔥</span>
+            )}
           </div>
         </div>
 
@@ -257,20 +287,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="bg-[#171b22] border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
           <div>
             <h3 className="text-sm font-bold text-white">Study consistency</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Illustrative weekly focused study hours</p>
+            <p className="text-xs text-slate-400 mt-0.5">Paced for {planState.profile.dailyHours}h daily target</p>
           </div>
 
           {/* 7-Day Bar Chart */}
           <div className="pt-4 pb-2">
             <div className="h-32 flex items-end justify-between gap-2 px-2">
               {[
-                { day: 'Sun', height: '40%', active: false, hours: '3.0h' },
-                { day: 'Mon', height: '65%', active: false, hours: '5.2h' },
-                { day: 'Tue', height: '45%', active: false, hours: '3.5h' },
-                { day: 'Wed', height: '85%', active: false, hours: '6.8h' },
-                { day: 'Thu', height: '30%', active: false, hours: '2.4h' },
-                { day: 'Fri', height: '70%', active: false, hours: '5.5h' },
-                { day: 'Sat', height: '55%', active: true, hours: '4.2h' }
+                { day: 'Sun', height: `${Math.min(100, Math.round(((planState.profile.dailyHours * 0.7) / 10) * 100))}%`, active: false, hours: `${(planState.profile.dailyHours * 0.7).toFixed(1)}h` },
+                { day: 'Mon', height: `${Math.min(100, Math.round(((planState.profile.dailyHours * 1.1) / 10) * 100))}%`, active: false, hours: `${(planState.profile.dailyHours * 1.1).toFixed(1)}h` },
+                { day: 'Tue', height: `${Math.min(100, Math.round(((planState.profile.dailyHours * 0.8) / 10) * 100))}%`, active: false, hours: `${(planState.profile.dailyHours * 0.8).toFixed(1)}h` },
+                { day: 'Wed', height: `${Math.min(100, Math.round(((planState.profile.dailyHours * 1.2) / 10) * 100))}%`, active: false, hours: `${(planState.profile.dailyHours * 1.2).toFixed(1)}h` },
+                { day: 'Thu', height: `${Math.min(100, Math.round(((planState.profile.dailyHours * 0.6) / 10) * 100))}%`, active: false, hours: `${(planState.profile.dailyHours * 0.6).toFixed(1)}h` },
+                { day: 'Fri', height: `${Math.min(100, Math.round(((planState.profile.dailyHours * 1.0) / 10) * 100))}%`, active: false, hours: `${(planState.profile.dailyHours * 1.0).toFixed(1)}h` },
+                { day: 'Sat', height: `${Math.min(100, Math.round(((planState.profile.dailyHours * 0.9) / 10) * 100))}%`, active: true, hours: `${(planState.profile.dailyHours * 0.9).toFixed(1)}h` }
               ].map((bar, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2 group cursor-default">
                   <div className="w-full flex justify-center h-28 items-end">
@@ -297,8 +327,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-3">
-            <span>Weekly Target: <strong className="text-white">35h</strong></span>
-            <span className="text-[#A3E635] font-bold">Ahead of Target</span>
+            <span>Weekly Target: <strong className="text-white">{planState.profile.dailyHours * 7}h</strong></span>
+            <span className="text-[#A3E635] font-bold">
+              {planState.profile.currentStreak > 0 ? `${planState.profile.currentStreak}-Day Streak 🔥` : 'Active Sprint'}
+            </span>
           </div>
         </div>
       </div>

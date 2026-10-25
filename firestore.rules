@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // Test connection probe
+    match /test/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // User profile documents
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && request.resource.data.uid == userId;
+      allow delete: if isOwner(userId);
+
+      // Mistake Notebook / Error Logs Subcollection
+      match /errorLogs/{errorId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Exam History Subcollection
+      match /examHistory/{examId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Saved Formulas Subcollection
+      match /savedFormulas/{formulaId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}
+

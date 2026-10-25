@@ -88,7 +88,7 @@ export interface ErrorLogItem {
 export interface MockExamPreset {
   id: string;
   title: string;
-  category: 'Full Mock' | 'Subject Test' | 'PYQ Year Paper' | 'Speed Drill';
+  category: 'Full Mock' | 'Subject Test' | 'PYQ Year Paper' | 'Speed Drill' | '3-Hour Full Mock' | 'Sectional Mock' | '30-Min Revision Mock' | '15-Min Rapid Sprint';
   questionCount: number;
   durationMinutes: number;
   totalMarks: number;
